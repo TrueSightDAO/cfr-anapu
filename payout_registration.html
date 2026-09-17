@@ -171,18 +171,18 @@
 
   <script>
     // ---------------------------------------------------------------------------
-    // PRIVATE PAYOUT SINK.
+    // PAYOUT REGISTRATION → EDGAR → PRIVATE `cfr program` SHEET.
     //
-    // This page deliberately does NOT submit to Edgar. Edgar's intake is
-    // republished as a public raw chatlog, so a PIX key (often a CPF) sent
-    // there would become public — an LGPD violation. Instead the raw key goes
-    // ONLY to a restricted Web-App endpoint that appends it to a PRIVATE sheet
-    // readable by the payout operator.
+    // Per plan §11.6 this page submits a signed [PAYOUT REGISTRATION] event via
+    // Edgar (RSA route). Edgar writes the payload to Telegram Chat Logs col G,
+    // and the sink appends it to the PRIVATE, governor-only `cfr program`
+    // `payout registrations` tab. The raw PIX key therefore lives only in the
+    // private sheet — never on a public surface.
     //
-    // SINK PROVISIONING IS GOVERNOR-GATED (see plans/CRF_ANAPU_SUNMINT_COHORT_PROPOSAL.md
-    // §11). Until PAYOUT_SINK_URL is set to the restricted deployment's /exec URL,
-    // this page validates + redacts locally and tells the student their key was
-    // NOT yet transmitted, rather than leaking it anywhere.
+    // The PUBLIC JSON-cache generators must EXCLUDE [PAYOUT REGISTRATION]
+    // (§11.4) so the raw key never lands in `verify_public_signatures/**`.
+    // The on-screen echo stays masked; the raw key is carried only in the
+    // signed event text.
     // ---------------------------------------------------------------------------
     const EDGAR_BASE = 'https://edgar.truesight.me';
     const EDGAR_SUBMIT_URL = `${EDGAR_BASE}/dao/submit_contribution`;
