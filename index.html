@@ -1,169 +1,1181 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Casa Familiar Rural de Anapu | TrueSight DAO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Casa Familiar Rural de Anapu — CEPOTX / SunMint tree-planting program, co-credentialed via TrueSight DAO." />
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Sunmint - Aplicativo simplificado para agricultores: vincule seu email e registre o plantio de árvores.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunmint - TrueSight DAO</title>
 
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://cfr.truesight.me/" />
-    <meta property="og:title" content="Casa Familiar Rural de Anapu | TrueSight DAO" />
-    <meta property="og:description" content="Students planting native Amazonian trees — one verified tree, one credential." />
-    <meta property="og:image" content="https://raw.githubusercontent.com/TrueSightDAO/.github/main/assets/crf-anapu-hero.jpg" />
+  <!-- Open Graph tags for WhatsApp, Facebook, LinkedIn, and social media previews -->
+  <meta property="og:title" content="Sunmint - TrueSight DAO">
+  <meta property="og:description" content="Aplicativo simplificado para agricultores: vincule seu email e registre o plantio de árvores.">
+  <meta property="og:image" content="https://github.com/TrueSightDAO/.github/blob/main/assets/20240612_truesight_dao_logo_square.png?raw=true">
+  <meta property="og:url" content="https://cfr.truesight.me/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TrueSight DAO">
 
-    <link rel="icon" href="https://static.wixstatic.com/ficons/0e2cde_dd65db118f8f499eb06c159d7262167d%7Emv2.ico" type="image/x-icon" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles/main.css" />
-    <style>
-      .program-page { max-width: 920px; margin: 0 auto; padding: var(--space-xl) 0; }
-      .program-backlink { margin: 0 0 var(--space-md); font-size: 0.85rem; }
-      .program-backlink a { color: var(--muted, #666); text-decoration: none; }
-      .program-backlink a:hover { color: var(--text, #222); text-decoration: underline; }
-      .program-hero { text-align: center; margin-bottom: var(--space-xl); }
-      .program-hero-photo {
-        display: block; width: 100%; height: auto; aspect-ratio: 4 / 3;
-        object-fit: cover; border-radius: 12px; margin: 0 auto var(--space-md);
-      }
-      .program-hero-logo {
-        display: block; max-width: 180px; max-height: 180px;
-        margin: 0 auto var(--space-md); object-fit: contain;
-      }
-      .program-hero .pill {
-        display: inline-block; padding: 0.25rem 0.7rem; background: var(--surface, #f5f5f5);
-        border-radius: 999px; font-size: 0.78rem; text-transform: uppercase;
-        letter-spacing: 0.08em; font-weight: 600; color: var(--muted, #555);
-      }
-      .program-hero h1 { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 2.6rem; margin: var(--space-sm) 0 var(--space-xs); }
-      .program-hero .partner-line { color: var(--muted, #666); font-size: 0.95rem; margin-top: 0.35rem; }
-      .program-tagline { color: var(--muted, #555); max-width: 640px; margin: var(--space-md) auto 0; font-size: 1.05rem; }
-      .program-description { margin: var(--space-xl) 0; line-height: 1.65; }
-      .program-cta-row { display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap; margin-top: var(--space-xl); }
-      .program-cta {
-        display: inline-block; padding: 0.7rem 1.4rem; border-radius: 999px;
-        font-weight: 600; text-decoration: none;
-      }
-      .program-cta.primary { background: #6a4a1a; color: #fff; }
-      .program-cta.secondary { background: var(--surface, #f5f5f5); color: var(--text, #222); border: 1px solid var(--border, #ddd); }
-      .program-cta:hover { transform: translateY(-1px); }
+  <!-- Twitter Card tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sunmint - TrueSight DAO">
+  <meta name="twitter:description" content="Aplicativo simplificado para agricultores: vincule seu email e registre o plantio de árvores.">
+  <meta name="twitter:image" content="https://github.com/TrueSightDAO/.github/blob/main/assets/20240612_truesight_dao_logo_square.png?raw=true">
 
-      .cobrand-strip {
-        display: flex; align-items: center; gap: 1rem;
-        padding: var(--space-md); margin-bottom: var(--space-md);
-        background: #fff8ea; border: 1px solid #eed9a8; border-radius: 10px;
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://github.com/TrueSightDAO/.github/blob/main/assets/20240612_truesight_dao_logo_square.png?raw=true">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 1rem;
+      padding: 1rem;
+      min-height: 100vh;
+      box-sizing: border-box;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background-color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    /* Secondary/optional sections (email linking) — same container shell for
+       consistency, but visually lighter so they don't compete with the
+       primary action above them. */
+    .container.optional-section {
+      box-shadow: none;
+      border: 1px solid #e5e5e5;
+    }
+    .container.optional-section h3 {
+      color: #666;
+      font-size: 1.05rem;
+      margin: 0 0 0.6rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #333;
+      margin: 0.5rem 0 1rem;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.3rem;
+      color: #333;
+      margin: 0 0 1rem;
+    }
+    p.intro {
+      color: #555;
+      font-size: 1rem;
+      line-height: 1.5;
+      text-align: center;
+      margin: 0 0 1.5rem;
+    }
+    .lang-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .nav-dropdown {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .nav-dropdown select {
+      max-width: 300px;
+      display: inline-block;
+    }
+    .nav-dropdown label {
+      font-weight: bold;
+      margin-right: 0.4rem;
+      display: inline;
+    }
+    .lang-toggle button {
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0.3rem 0.8rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .lang-toggle button.active {
+      background-color: #2e7d32;
+      color: white;
+      border-color: #2e7d32;
+    }
+    label {
+      display: block;
+      margin: 0.8rem 0 0.3rem;
+      font-weight: bold;
+      color: #333;
+    }
+    input[type="email"], input[type="text"], input[type="file"], select {
+      width: 100%;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button.submit-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: white;
+      background-color: #2e7d32;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button.submit-btn:disabled {
+      background-color: #9e9e9e;
+      cursor: not-allowed;
+    }
+    a.download-btn {
+      display: inline-block;
+      margin-top: 0.8rem;
+      padding: 0.8rem 1.4rem;
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: white;
+      background-color: #e08232;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    a.download-btn:hover {
+      background-color: #c97020;
+    }
+    #treeCameraPreview, #treePhotoPreview {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      min-height: 140px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-top: 0.4rem;
+      background-color: #eee;
+    }
+    #treePhotoPreview {
+      display: none;
+    }
+    .camera-row {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.6rem;
+    }
+    button.camera-btn {
+      flex: 1;
+      padding: 0.6rem;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: white;
+      background-color: #2e7d32;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button.camera-btn.secondary {
+      background-color: #757575;
+    }
+    button.camera-btn:disabled {
+      background-color: #9e9e9e;
+      cursor: not-allowed;
+    }
+    #status, #treeStatus {
+      margin-top: 0.8rem;
+      font-size: 0.95rem;
+      color: #333;
+    }
+    #status.error, #treeStatus.error {
+      color: #c62828;
+    }
+    #status.success, #treeStatus.success {
+      color: #2e7d32;
+    }
+    .hint {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 0.3rem;
+    }
+    pre {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.8rem;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .submission-result h3 {
+      font-size: 1rem;
+      margin: 1rem 0 0.4rem;
+    }
+    @media print {
+      pre {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        overflow: visible !important;
+        page-break-inside: auto;
       }
-      .cobrand-logo { width: 56px; height: 56px; object-fit: contain; flex-shrink: 0; }
-      .cobrand-text { flex: 1; }
-      .cobrand-line { font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 600; }
-      .cobrand-program { font-size: 1rem; }
-      .cobrand-divider { margin: 0 0.4rem; color: var(--muted); }
-      .cobrand-issuer { font-weight: 400; color: var(--muted, #555); font-size: 0.92rem; }
-      .cobrand-issuer a { color: inherit; text-decoration: underline; }
-      .cobrand-tagline { color: var(--muted, #666); font-size: 0.88rem; margin-top: 0.25rem; }
-      .cobrand-partner-link { display: inline-block; margin-top: 0.5rem; font-size: 0.88rem; color: #6a4a1a; }
+    }
+  </style>
+</head>
+<body>
 
-      /* Program media gallery (JSON-driven via js/media-gallery.js) */
-      .program-gallery { margin-top: 3rem; }
-      .program-gallery > h2 { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 1.6rem; margin: 0 0 var(--space-sm); }
-      .program-gallery-intro { color: var(--muted, #666); max-width: 640px; margin: 0 0 var(--space-md); }
-      .farm-video-section {
-        margin: 2rem 0; border-radius: 12px; overflow: hidden;
-        background: var(--surface, #fff9f0); border: 1px solid var(--border, #e6dcc9);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-      }
-      .farm-video-container {
-        position: relative; width: 100%; max-width: 800px; margin: 0 auto;
-        background: #f3ede2;
-        /* Responsive 16:9 box (iframes have no intrinsic aspect ratio, unlike <img>) */
-        padding-bottom: 56.25%; height: 0; overflow: hidden;
-      }
-      .farm-video { display: block; }
-      .farm-video-container iframe.farm-video {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
-      }
-      .farm-video-container img.farm-video {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        object-fit: cover; object-position: center;
-      }
-      .farm-video-section p {
-        padding: 0.8rem 1rem; margin: 0; color: var(--muted, #666); font-size: 0.85rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="site-nav"></div>
-<script src="js/nav.js"></script>
+  <div class="lang-toggle">
+    <button id="langPt" class="active" onclick="setLang('pt')">Português</button>
+    <button id="langEn" onclick="setLang('en')">English</button>
+  </div>
 
-    <div class="page">
-      <div class="program-page">
-        <div id="cobrand-strip"></div>
+  <div class="nav-dropdown">
+    <label for="pageNav" data-i18n="navLabel">Página:</label>
+    <select id="pageNav" onchange="onNavChange()">
+      <option value="plant" data-i18n="navPlant" selected>Registrar Plantio</option>
+      <option value="monitor" data-i18n="navMonitor">Monitorar Árvore</option>
+      <option value="limites" data-i18n="navLimites">Limites da Fazenda</option>
+      <option value="instrucoes" data-i18n="navInstrucoes">Instruções</option>
+    </select>
+  </div>
 
-        <p class="program-backlink"><a href="https://truesight.me/programs.html">← All programs</a></p>
-
-        <div class="program-hero">
-          <img id="program-hero-photo" class="program-hero-photo" alt="" style="display:none" />
-          <img id="program-hero-logo" class="program-hero-logo" alt="" style="display:none" />
-          <span class="pill">Tree-planting credentialing</span>
-          <h1 id="program-name">Casa Familiar Rural de Anapu</h1>
-          <div class="partner-line">By <span id="program-partner">CEPOTX</span></div>
-          <p class="program-tagline" id="program-tagline">Loading…</p>
-        </div>
-
-        <div id="program-status"></div>
-        <div class="program-description" id="program-description"></div>
-
-        <section class="program-gallery" id="program-gallery">
-          <h2>Field notes from Anapu</h2>
-          <p class="program-gallery-intro">Photos from the 9 September 2026 site visit to the Casa Familiar Rural Dorothy Stang with the CEPOTX team.</p>
-          <div class="farm-videos-container" id="media-gallery"></div>
-        </section>
-
-        <div class="program-cta-row">
-          <a class="program-cta primary" href="members.html">View cohort →</a>
-          <a class="program-cta secondary" id="program-source-link" style="display:none" target="_blank" rel="noopener noreferrer">Visit partner site →</a>
-        </div>
-      </div>
+  <div class="container">
+    <div style="text-align:center;">
+      <img height="120px" src="https://github.com/TrueSightDAO/.github/blob/main/assets/20240612_truesight_dao_logo_square.png?raw=true" alt="TrueSight DAO Logo"/>
+      <h1>Sunmint</h1>
     </div>
+    <p class="intro" data-i18n="intro">Aplicativo simplificado para agricultores da TrueSight DAO. Vincule seu email e registre o plantio de árvores em poucos passos.</p>
 
-    <script src="js/program-shell.js"></script>
-    <script src="js/media-gallery.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        TrueSightProgramShell.init({ manifestPath: './manifest.json', type: 'landing' });
-        // Optional hero photo (manifest.hero_image_url). Falls back to the
-        // partner logo rendered by the shared shell when absent or on error,
-        // so other program pages remain untouched.
-        fetch('./manifest.json', { cache: 'no-store' })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (m) {
-            if (!m || !m.hero_image_url) return;
-            var photo = document.getElementById('program-hero-photo');
-            var logo = document.getElementById('program-hero-logo');
-            if (!photo) return;
-            photo.onload = function () { photo.style.display = 'block'; if (logo) logo.style.display = 'none'; };
-            photo.onerror = function () { photo.style.display = 'none'; };
-            photo.alt = (m.display_name || '') + ' — program photo';
-            photo.src = m.hero_image_url;
-          })
-          .catch(function () { /* silent — logo fallback stays */ });
+    <!-- Section 1 (primary action): Report tree planting. Doesn't require
+         linking an email first — a keypair is generated on demand and every
+         report is signed with it regardless of email status. Leads the page
+         since this is the actual reason a farmer opens the app in the field. -->
+    <h2 data-i18n="treeHeading">Registrar plantio de árvore</h2>
+    <p class="hint" data-i18n="treeHint">Envie uma foto da árvore plantada. Localização (se disponível) e data são registradas automaticamente.</p>
+
+    <label for="treeSpecies" data-i18n="speciesLabel">Espécie da árvore</label>
+    <select id="treeSpecies" onchange="onSpeciesChange()">
+      <option value="Cacao - Criolla" data-i18n="speciesCriolla" selected>Cacau - Criolla</option>
+      <option value="Cacao - Trinitario" data-i18n="speciesTrinitario">Cacau - Trinitario</option>
+      <option value="Cacao - Forestero" data-i18n="speciesForestero">Cacau - Forestero</option>
+      <option value="Other" data-i18n="speciesOther">Outra (especifique)</option>
+    </select>
+    <input type="text" id="treeSpeciesOther" style="display:none; margin-top:0.5rem;" placeholder="Nome da espécie" data-i18n-placeholder="speciesOtherPlaceholder">
+
+    <label data-i18n="photoLabel">Foto da árvore</label>
+    <video id="treeCameraPreview" autoplay playsinline muted></video>
+    <canvas id="treeCaptureCanvas" style="display:none;"></canvas>
+    <img id="treePhotoPreview" style="display:none;" alt="">
+    <div class="camera-row">
+      <button type="button" class="camera-btn" id="captureBtn" onclick="capturePhoto()" data-i18n="captureButton">Tirar foto</button>
+      <button type="button" class="camera-btn secondary" id="retakeBtn" onclick="retakePhoto()" style="display:none;" data-i18n="retakeButton">Tirar outra</button>
+    </div>
+    <div class="camera-row">
+      <input type="file" id="treePhotoFile" accept="image/*" style="display:none;">
+      <button type="button" class="camera-btn secondary" id="uploadPhotoBtn" onclick="document.getElementById('treePhotoFile').click()" data-i18n="uploadButton">Enviar foto da galeria</button>
+    </div>
+    <div id="cameraStatus" class="hint" aria-live="polite"></div>
+
+    <button class="submit-btn" id="treeSubmitBtn" onclick="submitTreePlanting()" data-i18n="treeButton">Enviar registro</button>
+    <div id="treeStatus" aria-live="polite"></div>
+    <div id="pendingBadge" class="hint" aria-live="polite" style="display:none;"></div>
+  </div>
+
+  <!-- Section 2 (optional, secondary): Link email. Not a prerequisite for
+       reporting above — this only attaches a human-readable contact to the
+       public key that's already signing every report, so keep it visually
+       lighter than the primary action. -->
+  <div class="container optional-section">
+    <h3 data-i18n="emailHeading">Vincular email (opcional)</h3>
+    <p class="hint" data-i18n="emailHint">Seu email é usado para identificá-lo na TrueSight DAO. Isso cria (ou reutiliza) sua assinatura digital neste telefone/navegador.</p>
+    <div id="emailUnlinked">
+      <label for="emailInput" data-i18n="emailLabel">Seu email</label>
+      <input type="email" id="emailInput" placeholder="voce@exemplo.com" autocomplete="email" onkeydown="if(event.key==='Enter'){event.preventDefault();submitEmailLink();}">
+      <button class="submit-btn" id="emailSubmitBtn" onclick="submitEmailLink()" data-i18n="emailButton">Vincular email</button>
+    </div>
+    <div id="emailLinked" style="display:none;">
+      <p class="hint"><span data-i18n="emailLinkedLabel"></span> <strong id="linkedEmailDisplay"></strong></p>
+      <button class="submit-btn" id="emailUnlinkBtn" onclick="unlinkEmail()" data-i18n="emailUnlinkButton">Desvincular email</button>
+    </div>
+    <div id="status" aria-live="polite"></div>
+  </div>
+
+  <div class="container submission-result" id="submissionResult" style="display:none;">
+    <h3 data-i18n="requestHeading">Pedido enviado (assinado)</h3>
+    <pre id="requestPre"></pre>
+    <h3 data-i18n="responseHeading">Resposta do servidor</h3>
+    <pre id="responsePre"></pre>
+  </div>
+
+  <!-- Android app download (footer CTA) -->
+  <div class="container optional-section" style="text-align:center;">
+    <h3 data-i18n="downloadHeading">Baixe o aplicativo Android</h3>
+    <p class="hint" data-i18n="downloadHint">Prefere o aplicativo nativo? Funciona sem internet e salva os registros no seu celular.</p>
+    <a class="download-btn" href="https://sunmint.truesight.me/sunmint-android.apk" data-i18n="downloadButton">Baixar APK (Android)</a>
+  </div>
+
+  <script>
+    // ── i18n ─────────────────────────────────────────────────────────────
+    const I18N = {
+      pt: {
+        intro: "Aplicativo simplificado para agricultores da TrueSight DAO. Registre o plantio de árvores em poucos passos — vincular seu email é opcional.",
+        navLabel: "Página:",
+        navPlant: "Registrar Plantio",
+        navMonitor: "Monitorar Árvore",
+        navInstrucoes: "Instruções",
+        navLimites: "Limites da Fazenda",
+        downloadHeading: "Baixe o aplicativo Android",
+        downloadHint: "Prefere o aplicativo nativo? Funciona sem internet e salva os registros no seu celular.",
+        downloadButton: "Baixar APK (Android)",
+        emailHeading: "Vincular email (opcional)",
+        emailHint: "Seu email é usado para identificá-lo na TrueSight DAO. Isso cria (ou reutiliza) sua assinatura digital neste telefone/navegador.",
+        emailLabel: "Seu email",
+        emailButton: "Vincular email",
+        emailVerified: "Email confirmado com sucesso!",
+        emailLinkedLabel: "Email vinculado:",
+        emailUnlinkButton: "Desvincular email",
+        emailUnlinkConfirm: "Desvincular este email? Sua assinatura digital neste navegador será removida.",
+        emailUnlinked: "Email desvinculado. Sua assinatura digital foi removida deste navegador.",
+        treeHeading: "Registrar plantio de árvore",
+        treeHint: "Tire uma foto da árvore plantada. Funciona sem internet — cada registro fica salvo neste telefone e é enviado automaticamente quando houver conexão. Localização (se disponível) e data são registradas automaticamente.",
+        speciesLabel: "Espécie da árvore",
+        speciesCriolla: "Cacau - Criolla",
+        speciesTrinitario: "Cacau - Trinitario",
+        speciesForestero: "Cacau - Forestero",
+        speciesOther: "Outra (especifique)",
+        speciesOtherPlaceholder: "Nome da espécie",
+        speciesOtherRequired: "Por favor, informe o nome da espécie.",
+        photoLabel: "Foto da árvore",
+        captureButton: "Tirar foto",
+        retakeButton: "Tirar outra",
+        cameraStarting: "Iniciando câmera...",
+        cameraUnsupported: "Câmera não disponível neste navegador.",
+        cameraError: "Erro ao acessar a câmera: ",
+        photoCaptured: "Foto capturada.",
+        uploadButton: "Enviar foto da galeria",
+        photoUploaded: "Foto carregada da galeria.",
+        photoGpsFound: "GPS da foto usado para localiza\u00e7\u00e3o.",
+        photoGpsCoords: "Coordenadas GPS da foto \u2014 Latitude: {lat}, Longitude: {lng}.",
+        photoGpsMissing: "GPS n\u00e3o encontrado na foto \u2014 usando localiza\u00e7\u00e3o do aparelho (se dispon\u00edvel).",
+        treeButton: "Enviar registro",
+        requestHeading: "Pedido enviado (assinado)",
+        responseHeading: "Resposta do servidor",
+        emailRequired: "Por favor, digite um email.",
+        emailSending: "Enviando...",
+        emailSent: "Verifique seu email para confirmar o link.",
+        emailVerifying: "Confirmando seu email...",
+        emailVerified: "Email confirmado com sucesso!",
+        emailError: "Erro: ",
+        photoRequired: "Por favor, tire uma foto primeiro.",
+        treeSending: "Salvando registro...",
+        treeSent: "Registro enviado com sucesso!",
+        treeSavedOffline: "Salvo neste telefone. Será enviado automaticamente quando houver internet.",
+        treeError: "Erro: ",
+        locationNote: " (localização não disponível)",
+        pendingSingular: "1 registro pendente de envio (sem internet no momento).",
+        pendingPlural: " registros pendentes de envio (sem internet no momento).",
+        pendingUploading: "Enviando registros pendentes...",
+        pendingUploaded: "Registro(s) pendente(s) enviado(s) com sucesso!",
+        pendingPhotoPending: "Relatório enviado, mas a foto não foi salva no servidor. Vou tentar de novo.",
+      },
+      en: {
+        intro: "A simplified TrueSight DAO app for farmers. Report tree plantings in a few steps — linking your email is optional.",
+        navLabel: "Page:",
+        navPlant: "Plant Tree",
+        navMonitor: "Monitor Tree",
+        navInstrucoes: "Instructions",
+        navLimites: "Farm Boundaries",
+        downloadHeading: "Download the Android app",
+        downloadHint: "Prefer the native app? It works offline and saves your reports on your phone.",
+        downloadButton: "Download APK (Android)",
+        emailHeading: "Link email (optional)",
+        emailHint: "Your email identifies you to TrueSight DAO. This creates (or reuses) your digital signature on this phone/browser.",
+        emailLabel: "Your email",
+        emailButton: "Link email",
+        emailVerified: "Email confirmed successfully!",
+        emailLinkedLabel: "Email linked:",
+        emailUnlinkButton: "Unlink email",
+        emailUnlinkConfirm: "Unlink this email? Your digital signature on this browser will be removed.",
+        emailUnlinked: "Email unlinked. Your digital signature was removed from this browser.",
+        treeHeading: "Report a tree planting",
+        treeHint: "Take a photo of the planted tree. Works without internet — each report is saved on this phone and sent automatically once there's a connection. Location (if available) and date are recorded automatically.",
+        speciesLabel: "Tree species",
+        speciesCriolla: "Cacao - Criolla",
+        speciesTrinitario: "Cacao - Trinitario",
+        speciesForestero: "Cacao - Forestero",
+        speciesOther: "Other (specify)",
+        speciesOtherPlaceholder: "Species name",
+        speciesOtherRequired: "Please enter the species name.",
+        photoLabel: "Tree photo",
+        captureButton: "Take photo",
+        retakeButton: "Retake",
+        cameraStarting: "Starting camera...",
+        cameraUnsupported: "Camera not available in this browser.",
+        cameraError: "Error accessing camera: ",
+        photoCaptured: "Photo captured.",
+        uploadButton: "Choose from gallery",
+        photoUploaded: "Photo loaded from gallery.",
+        photoGpsFound: "Photo GPS used for location.",
+        photoGpsCoords: "Photo GPS coordinates \u2014 Latitude: {lat}, Longitude: {lng}.",
+        photoGpsMissing: "No GPS found in photo \u2014 using device location (if available).",
+        treeButton: "Submit report",
+        requestHeading: "Signed request sent",
+        responseHeading: "Server response",
+        emailRequired: "Please enter an email.",
+        emailSending: "Sending...",
+        emailSent: "Check your email to confirm the link.",
+        emailVerifying: "Confirming your email...",
+        emailVerified: "Email confirmed successfully!",
+        emailError: "Error: ",
+        photoRequired: "Please take a photo first.",
+        treeSending: "Saving report...",
+        treeSent: "Report sent successfully!",
+        treeSavedOffline: "Saved on this phone. It'll be sent automatically once there's internet.",
+        treeError: "Error: ",
+        locationNote: " (location not available)",
+        pendingSingular: "1 report pending upload (no internet right now).",
+        pendingPlural: " reports pending upload (no internet right now).",
+        pendingUploading: "Uploading pending reports...",
+        pendingUploaded: "Pending report(s) uploaded successfully!",
+        pendingPhotoPending: "Report sent, but the photo wasn't stored on the server. I'll retry.",
+      },
+    };
+    let currentLang = localStorage.getItem('sunmint_lang') || 'pt';
+
+    function t(key) {
+      return (I18N[currentLang] && I18N[currentLang][key]) || I18N.pt[key] || key;
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('sunmint_lang', lang);
+      document.documentElement.lang = lang;
+      document.getElementById('langPt').classList.toggle('active', lang === 'pt');
+      document.getElementById('langEn').classList.toggle('active', lang === 'en');
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        el.textContent = t(el.getAttribute('data-i18n'));
       });
-      // Hamburger
-      (function() {
-        const t = document.querySelector('.menu-toggle');
-        const m = document.querySelector('.nav-menu');
-        const h = document.querySelector('.site-header');
-        if (!t || !m) return;
-        t.addEventListener('click', function() {
-          const exp = t.getAttribute('aria-expanded') === 'true';
-          t.setAttribute('aria-expanded', !exp);
-          m.setAttribute('aria-hidden', exp);
-          h.classList.toggle('menu-open', !exp);
+      document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+        el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+      });
+    }
+
+    // ── Edgar endpoints ──────────────────────────────────────────────────
+    const EDGAR_BASE = 'https://edgar.truesight.me';
+    const EDGAR_SUBMIT_URL = `${EDGAR_BASE}/dao/submit_contribution`;
+
+    // ── RSA identity (same scheme as dapp/create_signature.html) ────────
+    function arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      return window.btoa(binary);
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binary = window.atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return bytes.buffer;
+    }
+
+    async function ensureKeyPair() {
+      let publicKey = localStorage.getItem('publicKey');
+      let privateKey = localStorage.getItem('privateKey');
+      if (publicKey && privateKey) return { publicKey, privateKey };
+
+      const keyPair = await window.crypto.subtle.generateKey(
+        { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+        true,
+        ['sign', 'verify']
+      );
+      const publicKeyRaw = await window.crypto.subtle.exportKey('spki', keyPair.publicKey);
+      const privateKeyRaw = await window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+      publicKey = arrayBufferToBase64(publicKeyRaw);
+      privateKey = arrayBufferToBase64(privateKeyRaw);
+      localStorage.setItem('publicKey', publicKey);
+      localStorage.setItem('privateKey', privateKey);
+      return { publicKey, privateKey };
+    }
+
+    async function signText(privateKeyBase64, text) {
+      const privateKeyObj = await window.crypto.subtle.importKey(
+        'pkcs8',
+        base64ToArrayBuffer(privateKeyBase64),
+        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      const encoder = new TextEncoder();
+      const signature = await window.crypto.subtle.sign(
+        'RSASSA-PKCS1-v1_5',
+        privateKeyObj,
+        encoder.encode(text)
+      );
+      return arrayBufferToBase64(signature);
+    }
+
+    function renderSubmissionResult(shareText, responseData) {
+      document.getElementById('requestPre').textContent = shareText;
+      document.getElementById('responsePre').textContent = JSON.stringify(responseData, null, 2);
+      document.getElementById('submissionResult').style.display = 'block';
+    }
+
+    // ── Section 1: link email (mirrors create_signature.html's flow) ───
+    async function submitEmailEvent(eventName, attributes) {
+      const { publicKey, privateKey } = await ensureKeyPair();
+      const attrLines = Object.entries(attributes).map(([k, v]) => `- ${k}: ${v}`).join('\n');
+      const requestText = `[${eventName}]\n${attrLines}\n--------`;
+      const signature = await signText(privateKey, requestText);
+      const shareText = `${requestText}\n\nMy Digital Signature: ${publicKey}\n\nRequest Transaction ID: ${signature}\n\nThis submission was generated using ${window.location.href}\n\nVerify submission here: https://dapp.truesight.me/verify_request.html`;
+
+      const formData = new FormData();
+      formData.append('text', shareText);
+      const resp = await fetch(EDGAR_SUBMIT_URL, { method: 'POST', body: formData });
+      const rawText = await resp.text();
+      let data = {};
+      try { data = rawText ? JSON.parse(rawText) : {}; } catch (_) { data = {}; }
+      if (!resp.ok) {
+        throw new Error((data && data.error) || rawText || `HTTP ${resp.status}`);
+      }
+      renderSubmissionResult(shareText, data);
+      return data;
+    }
+
+    async function submitEmailLink() {
+      const statusEl = document.getElementById('status');
+      const email = document.getElementById('emailInput').value.trim();
+      if (!email) {
+        statusEl.textContent = t('emailRequired');
+        statusEl.className = 'error';
+        return;
+      }
+      const btn = document.getElementById('emailSubmitBtn');
+      btn.disabled = true;
+      statusEl.className = '';
+      statusEl.textContent = t('emailSending');
+      try {
+        await submitEmailEvent('EMAIL REGISTERED EVENT', { Email: email });
+        statusEl.textContent = t('emailSent');
+        statusEl.className = 'success';
+      } catch (err) {
+        statusEl.textContent = t('emailError') + err.message;
+        statusEl.className = 'error';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Auto-fire EMAIL VERIFICATION EVENT if opened via the emailed link (?vk=&em=)
+    function getLinkedEmail() {
+      return localStorage.getItem('sunmint_linked_email') || '';
+    }
+
+    function renderEmailSection() {
+      const linked = getLinkedEmail();
+      const unlinkedEl = document.getElementById('emailUnlinked');
+      const linkedEl = document.getElementById('emailLinked');
+      if (!unlinkedEl || !linkedEl) return;
+      unlinkedEl.style.display = linked ? 'none' : '';
+      linkedEl.style.display = linked ? '' : 'none';
+      document.getElementById('linkedEmailDisplay').textContent = linked;
+      // Note: no #emailLinkedLabel element exists (only data-i18n="emailLinkedLabel"),
+      // so do not touch it here — setLang() keeps it in sync.
+    }
+
+    function unlinkEmail() {
+      if (!confirm(t('emailUnlinkConfirm'))) return;
+      localStorage.removeItem('publicKey');
+      localStorage.removeItem('privateKey');
+      localStorage.removeItem('sunmint_linked_email');
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = t('emailUnlinked');
+      statusEl.className = 'success';
+      renderEmailSection();
+    }
+
+    async function checkVerificationLink() {
+      const url = new URL(window.location.href);
+      const vk = url.searchParams.get('vk');
+      const em = url.searchParams.get('em');
+      if (!vk || !em) return;
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = t('emailVerifying');
+      statusEl.className = '';
+      try {
+        await submitEmailEvent('EMAIL VERIFICATION EVENT', { 'Verification Key': vk, Email: em });
+        statusEl.textContent = t('emailVerified');
+        statusEl.className = 'success';
+        localStorage.setItem('sunmint_linked_email', em);
+        renderEmailSection();
+      } catch (err) {
+        statusEl.textContent = t('emailError') + err.message;
+        statusEl.className = 'error';
+      } finally {
+        url.searchParams.delete('vk');
+        url.searchParams.delete('em');
+        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+      }
+    }
+
+    // ── Section 2: report tree planting (mirrors report_tree_planting.html) ─
+    //
+    // Farms often have no internet connection. So: sign the report and queue
+    // it in IndexedDB (photo blob + already-signed text) the moment the
+    // farmer taps submit, reset the form immediately so they can capture the
+    // next tree right away, and try to flush the whole queue in the
+    // background — on this submit, on page load, and whenever the browser
+    // regains connectivity. Mirrors the technique in
+    // capoeira/assets/js/practice-event-submit.js (localStorage history +
+    // submitted_at marker + backfillUnsent() on load), adapted to IndexedDB
+    // because photos are binary blobs too large/numerous for localStorage's
+    // quota — everything else (immediate-attempt, leave unmarked on
+    // failure, rescan on load) is the same shape.
+    let latitude = null;
+    let longitude = null;
+    let locationSource = null; // 'photo' | 'device' | null
+
+    function requestLocation() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (locationSource !== 'photo') {
+            latitude = pos.coords.latitude;
+            longitude = pos.coords.longitude;
+            locationSource = 'device';
+          }
+        },
+        () => { /* optional — submission proceeds without location */ },
+        { timeout: 8000 }
+      );
+    }
+
+    const TREE_QUEUE_DB = 'sunmint_offline';
+    const TREE_QUEUE_STORE = 'tree_reports';
+
+    function openTreeQueueDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(TREE_QUEUE_DB, 1);
+        req.onupgradeneeded = () => {
+          req.result.createObjectStore(TREE_QUEUE_STORE, { keyPath: 'id' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function queueTreeReport(record) {
+      const db = await openTreeQueueDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(TREE_QUEUE_STORE, 'readwrite');
+        tx.objectStore(TREE_QUEUE_STORE).put(record);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function getPendingTreeReports() {
+      const db = await openTreeQueueDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(TREE_QUEUE_STORE, 'readonly');
+        const req = tx.objectStore(TREE_QUEUE_STORE).getAll();
+        req.onsuccess = () => resolve((req.result || []).filter((r) => !r.uploaded));
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function markTreeReportUploaded(id) {
+      const db = await openTreeQueueDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(TREE_QUEUE_STORE, 'readwrite');
+        const store = tx.objectStore(TREE_QUEUE_STORE);
+        const getReq = store.get(id);
+        getReq.onsuccess = () => {
+          const record = getReq.result;
+          if (record) {
+            record.uploaded = true;
+            record.uploadedAt = new Date().toISOString();
+            store.put(record);
+          }
+        };
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    // Persist that this record's photo failed to reach storage, so the blob is
+    // preserved (never evicted by markTreeReportUploaded) and a later flush
+    // retries it rather than assuming it is done.
+    async function markTreeReportPhotoPending(id) {
+      const db = await openTreeQueueDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(TREE_QUEUE_STORE, 'readwrite');
+        const store = tx.objectStore(TREE_QUEUE_STORE);
+        const getReq = store.get(id);
+        getReq.onsuccess = () => {
+          const record = getReq.result;
+          if (record) {
+            record.photoUploadPending = true;
+            record.photoUploadPendingAt = new Date().toISOString();
+            store.put(record);
+          }
+        };
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    // A submission is only fully done when Edgar recorded the event AND the
+    // attached photo actually landed in the sunmint repo. Edgar reports the
+    // binary upload separately as fileUploadedToGithub; a 200 with
+    // fileUploadedToGithub === false means the signed event was accepted but
+    // the binary upload silently dropped (e.g. a GitHub secondary rate limit on
+    // a burst of photos). Treating that as success would evict the only
+    // surviving copy of the photo from IndexedDB and lose it, so we do not.
+    function photoLanded(data) {
+      return !(data && data.fileUploadedToGithub === false);
+    }
+
+    async function uploadTreeReport(record) {
+      const formData = new FormData();
+      formData.append('text', record.shareText);
+      formData.append('attachment', record.photoBlob, record.photoName);
+      const resp = await fetch(EDGAR_SUBMIT_URL, { method: 'POST', body: formData });
+      const rawText = await resp.text();
+      let data = {};
+      try { data = rawText ? JSON.parse(rawText) : {}; } catch (_) { data = {}; }
+      // 409 means Edgar already processed this exact signed request (e.g. a
+      // prior flush attempt that succeeded server-side but failed to report
+      // back, common on flaky rural connections) — treat as success so it
+      // doesn't stay stuck retrying forever.
+      if (!resp.ok && resp.status !== 409) {
+        throw new Error((data && data.error) || rawText || `HTTP ${resp.status}`);
+      }
+      return data;
+    }
+
+    async function updatePendingBadge() {
+      const badge = document.getElementById('pendingBadge');
+      try {
+        const pending = await getPendingTreeReports();
+        if (pending.length === 0) {
+          badge.style.display = 'none';
+          return;
+        }
+        badge.style.display = 'block';
+        badge.textContent = pending.length === 1
+          ? t('pendingSingular')
+          : pending.length + t('pendingPlural');
+      } catch (_) { /* IndexedDB unavailable — badge just stays hidden */ }
+    }
+
+    // Flush every queued-but-unuploaded report. Safe to call repeatedly
+    // (page load, 'online' event, right after queuing a new one) — anything
+    // already uploaded is skipped, anything that fails (still offline) is
+    // simply left for the next attempt.
+    async function flushTreeReportQueue() {
+      let pending;
+      try {
+        pending = await getPendingTreeReports();
+      } catch (_) {
+        return;
+      }
+      if (pending.length === 0) return;
+
+      const statusEl = document.getElementById('treeStatus');
+      statusEl.textContent = t('pendingUploading');
+      statusEl.className = '';
+
+      let uploadedCount = 0;
+      let photoPendingCount = 0;
+      let lastResult = null;
+      for (const record of pending) {
+        try {
+          lastResult = await uploadTreeReport(record);
+          if (photoLanded(lastResult)) {
+            await markTreeReportUploaded(record.id);
+            uploadedCount++;
+          } else {
+            // Edgar recorded the event but the photo upload dropped: flag the
+            // record so its blob is preserved and it stays queued for retry.
+            await markTreeReportPhotoPending(record.id);
+            photoPendingCount++;
+          }
+        } catch (_) {
+          // Still offline (or Edgar unreachable) — leave queued, try again later.
+        }
+      }
+
+      if (photoPendingCount > 0) {
+        // Event(s) sent, but the photo(s) did not reach storage: surfaced so
+        // this is never a silent drop.
+        statusEl.textContent = t('pendingPhotoPending');
+        statusEl.className = 'error';
+      } else if (uploadedCount > 0) {
+        statusEl.textContent = t('pendingUploaded');
+        statusEl.className = 'success';
+      }
+      if (uploadedCount > 0 && lastResult) {
+        renderSubmissionResult(pending[pending.length - 1].shareText, lastResult);
+      }
+      await updatePendingBadge();
+    }
+
+    // ── Live camera capture (mirrors dapp/report_tree_planting.html's
+    // getUserMedia + canvas approach) — a file picker would let a farmer
+    // attach an old/wrong photo from their gallery; requiring a live
+    // capture keeps every report tied to a photo actually taken at the
+    // reported moment/location, same intent as the geolocation capture.
+    let cameraStream = null;
+    let capturedPhotoBlob = null;
+
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // Gallery photo option (governor-approved): the farmer may either use the
+    // live camera (above) or pick a photo from the gallery. If the chosen photo
+    // carries EXIF GPS, those coordinates take priority; otherwise the phone's
+    // geolocation (requestLocation) is used as fallback.
+    function readExifGps(file) {
+      return new Promise((resolve) => {
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const dv = new DataView(reader.result);
+            // JPEG carries its Exif TIFF in an APP1 segment; HEIC/HEIF (iPhone)
+            // carry it in a container item. Locate the TIFF either way:
+            // scan for 'Exif\x00\x00' + TIFF magic (MM 00 2A / II 2A 00).
+            let tiff = null;
+            if (dv.getUint16(0, false) === 0xFFD8) {
+              let off = 2;
+              while (off + 4 < dv.byteLength) {
+                if (dv.getUint8(off) !== 0xFF) { off++; continue; }
+                const marker = dv.getUint8(off + 1);
+                if (marker === 0xDA || marker === 0xD9) break;
+                const len = dv.getUint16(off + 2, false);
+                if (marker === 0xE1 && len >= 14 && tiff === null) {
+                  const head = String.fromCharCode(dv.getUint8(off+4),dv.getUint8(off+5),dv.getUint8(off+6),dv.getUint8(off+7),dv.getUint8(off+8),dv.getUint8(off+9));
+                  if (head === 'Exif\x00\x00') { tiff = off + 10; break; }
+                }
+                off += 2 + len;
+              }
+            }
+            if (tiff === null) {
+              for (let i = 2; i + 10 < dv.byteLength; i++) {
+                if (dv.getUint8(i) !== 0x45 || dv.getUint8(i+1) !== 0x78 || dv.getUint8(i+2) !== 0x69 ||
+                    dv.getUint8(i+3) !== 0x66 || dv.getUint8(i+4) !== 0x00 || dv.getUint8(i+5) !== 0x00) continue;
+                const e1 = dv.getUint8(i+6), e2 = dv.getUint8(i+7);
+                if ((e1 === 0x4D && e2 === 0x4D && dv.getUint8(i+8) === 0x00 && dv.getUint8(i+9) === 0x2A) ||
+                    (e1 === 0x49 && e2 === 0x49 && dv.getUint8(i+8) === 0x2A && dv.getUint8(i+9) === 0x00)) {
+                  tiff = i + 6; break;
+                }
+              }
+            }
+            if (tiff === null) return resolve(null);
+            const little = dv.getUint16(tiff, false) === 0x4949;
+            const u16 = (o) => dv.getUint16(o, little);
+            const u32 = (o) => dv.getUint32(o, little);
+            if (u16(tiff + 2) !== 0x002A) return resolve(null);
+            const ifd0 = tiff + u32(tiff + 4);
+            const n0 = u16(ifd0);
+            let gpsIfd = null;
+            for (let i = 0; i < n0; i++) {
+              const e = ifd0 + 2 + i * 12;
+              if (u16(e) === 0x8825) { gpsIfd = tiff + u32(e + 8); break; }
+            }
+            if (gpsIfd === null) return resolve(null);
+            const readRat = (o) => {
+              const num = u32(o), den = u32(o + 4);
+              return den === 0 ? null : num / den;
+            };
+            const gps = { lat: null, lng: null, latRef: '', lngRef: '' };
+            const gn = u16(gpsIfd);
+            for (let i = 0; i < gn; i++) {
+              const e = gpsIfd + 2 + i * 12;
+              const tag = u16(e);
+              if (tag === 1) { gps.latRef = String.fromCharCode(dv.getUint8(e+8)); }
+              else if (tag === 2) {
+                const base = tiff + u32(e+8);
+                const d = readRat(base), m = readRat(base+8), s = readRat(base+16);
+                if (d !== null && m !== null && s !== null) gps.lat = d + m/60 + s/3600;
+              } else if (tag === 3) { gps.lngRef = String.fromCharCode(dv.getUint8(e+8)); }
+              else if (tag === 4) {
+                const base = tiff + u32(e+8);
+                const d = readRat(base), m = readRat(base+8), s = readRat(base+16);
+                if (d !== null && m !== null && s !== null) gps.lng = d + m/60 + s/3600;
+              }
+            }
+            if (gps.lat === null || gps.lng === null) return resolve(null);
+            if (gps.latRef === 'S') gps.lat = -gps.lat;
+            if (gps.lngRef === 'W') gps.lng = -gps.lng;
+            if (gps.lat < -90 || gps.lat > 90 || gps.lng < -180 || gps.lng > 180) return resolve(null);
+            resolve({ lat: gps.lat, lng: gps.lng });
+          } catch (_) { resolve(null); }
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsArrayBuffer(file);
+      });
+    }
+    function downscaleImage(file, maxDim) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob((b) => b ? resolve(b) : resolve(file), 'image/jpeg', 0.85);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+        img.src = url;
+      });
+    }
+    async function handleTreePhotoFile(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const cameraStatus = document.getElementById('cameraStatus');
+      try {
+        const gps = await readExifGps(file);
+        if (cameraStream) { cameraStream.getTracks().forEach((tr) => tr.stop()); cameraStream = null; }
+        const video = document.getElementById('treeCameraPreview');
+        if (video) video.style.display = 'none';
+        const preview = document.getElementById('treePhotoPreview');
+        if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+        const blob = await downscaleImage(file, 1600);
+        capturedPhotoBlob = blob;
+        const url = URL.createObjectURL(blob);
+        preview.src = url;
+        preview.dataset.objectUrl = url;
+        preview.style.display = 'block';
+        document.getElementById('captureBtn').style.display = 'none';
+        document.getElementById('retakeBtn').style.display = 'block';
+        cameraStatus.className = 'success';
+        if (gps) {
+          latitude = gps.lat; longitude = gps.lng; locationSource = 'photo';
+          cameraStatus.textContent = t('photoUploaded') + ' ' + t('photoGpsFound') + ' ' +
+            t('photoGpsCoords').replace('{lat}', latitude.toFixed(6)).replace('{lng}', longitude.toFixed(6));
+        } else {
+          cameraStatus.textContent = t('photoUploaded') + ' ' + t('photoGpsMissing');
+        }
+      } catch (err) {
+        cameraStatus.textContent = t('cameraError') + err.message;
+        cameraStatus.className = 'error';
+      }
+    }
+    document.getElementById('treePhotoFile').addEventListener('change', handleTreePhotoFile);
+    async function startTreeCamera() {
+      const video = document.getElementById('treeCameraPreview');
+      const cameraStatus = document.getElementById('cameraStatus');
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        cameraStatus.textContent = t('cameraUnsupported');
+        cameraStatus.className = 'error';
+        document.getElementById('captureBtn').disabled = true;
+        return;
+      }
+      cameraStatus.textContent = t('cameraStarting');
+      cameraStatus.className = '';
+      const constraints = {
+        video: isMobileDevice()
+          ? { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+          : true,
+      };
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = cameraStream;
+        video.style.display = 'block';
+        cameraStatus.textContent = '';
+      } catch (err) {
+        cameraStatus.textContent = t('cameraError') + err.message;
+        cameraStatus.className = 'error';
+        document.getElementById('captureBtn').disabled = true;
+      }
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById('treeCameraPreview');
+      const canvas = document.getElementById('treeCaptureCanvas');
+      const preview = document.getElementById('treePhotoPreview');
+      const cameraStatus = document.getElementById('cameraStatus');
+      if (!cameraStream || !video.srcObject) {
+        // Camera not running yet — first tap starts it (mirrors
+        // monitor-tree-growth's gesture-safety pattern); tap again to capture.
+        startTreeCamera();
+        return;
+      }
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        capturedPhotoBlob = blob;
+        if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+        const url = URL.createObjectURL(blob);
+        preview.src = url;
+        preview.dataset.objectUrl = url;
+        preview.style.display = 'block';
+        video.style.display = 'none';
+        document.getElementById('captureBtn').style.display = 'none';
+        document.getElementById('retakeBtn').style.display = 'block';
+        cameraStatus.textContent = t('photoCaptured');
+        cameraStatus.className = 'success';
+      }, 'image/jpeg', 0.9);
+    }
+
+    function retakePhoto() {
+      capturedPhotoBlob = null;
+      const fileIn = document.getElementById('treePhotoFile');
+      if (fileIn) fileIn.value = '';
+      const preview = document.getElementById('treePhotoPreview');
+      if (preview.dataset.objectUrl) {
+        URL.revokeObjectURL(preview.dataset.objectUrl);
+        delete preview.dataset.objectUrl;
+      }
+      preview.style.display = 'none';
+      document.getElementById('treeCameraPreview').style.display = 'block';
+      document.getElementById('captureBtn').style.display = 'block';
+      document.getElementById('retakeBtn').style.display = 'none';
+      document.getElementById('cameraStatus').textContent = '';
+    }
+
+    // "Other" reveals a free-text field; every other option is a canonical
+    // value (matches real historical [TREE PLANTING EVENT] submissions —
+    // "Cacao" / "Cacao (Native)" — so downstream processing stays consistent
+    // regardless of which language the picker is shown in).
+    function onSpeciesChange() {
+      const select = document.getElementById('treeSpecies');
+      const other = document.getElementById('treeSpeciesOther');
+      other.style.display = select.value === 'Other' ? 'block' : 'none';
+    }
+
+    function getSelectedSpecies() {
+      const select = document.getElementById('treeSpecies');
+      if (select.value === 'Other') {
+        return document.getElementById('treeSpeciesOther').value.trim();
+      }
+      return select.value;
+    }
+
+    async function submitTreePlanting() {
+      const statusEl = document.getElementById('treeStatus');
+      const speciesSelect = document.getElementById('treeSpecies');
+      const species = getSelectedSpecies();
+
+      if (speciesSelect.value === 'Other' && !species) {
+        statusEl.textContent = t('speciesOtherRequired');
+        statusEl.className = 'error';
+        return;
+      }
+      if (!capturedPhotoBlob) {
+        statusEl.textContent = t('photoRequired');
+        statusEl.className = 'error';
+        return;
+      }
+
+      const btn = document.getElementById('treeSubmitBtn');
+      btn.disabled = true;
+      statusEl.className = '';
+      statusEl.textContent = t('treeSending');
+
+      try {
+        const { publicKey, privateKey } = await ensureKeyPair();
+        const plantingTime = new Date().toISOString();
+        const now = new Date();
+        const pad = (n) => n.toString().padStart(2, '0');
+        const yyyymmddhhmmss = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+        const safePublicKey = publicKey.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
+        const ext = 'jpg'; // canvas.toBlob(..., 'image/jpeg', ...) above
+        const reportId = `${yyyymmddhhmmss}_${safePublicKey}`;
+        const photoDestinationURL = `https://github.com/TrueSightDAO/sunmint/tree/main/images/${reportId}.${ext}`;
+
+        const locationLine = (latitude != null && longitude != null)
+          ? `- Latitude: ${latitude}\n- Longitude: ${longitude}\n`
+          : `- Latitude: \n- Longitude: \n`;
+
+        // Sign now, at capture time — Planting Time reflects the actual
+        // moment of the report, not whenever a connection is later found.
+        const requestText = `[TREE PLANTING EVENT]\n${locationLine}- Species: ${species}\n- Planting Time: ${plantingTime}\n- Photo URL: ${photoDestinationURL}\n- Submission Source: ${window.location.href}\n--------`;
+        const signature = await signText(privateKey, requestText);
+        const shareText = `${requestText}\n\nMy Digital Signature: ${publicKey}\n\nRequest Transaction ID: ${signature}\n\nThis submission was generated using ${window.location.href}\n\nVerify submission here: https://dapp.truesight.me/verify_request.html`;
+
+        await queueTreeReport({
+          id: reportId,
+          shareText,
+          photoBlob: capturedPhotoBlob,
+          photoName: `tree_photo.${ext}`,
+          createdAt: plantingTime,
+          uploaded: false,
         });
-      })();
-    </script>
-  <div id="site-footer"></div>
-<script src="js/footer.js"></script>
+
+        // Reset the form immediately — the farmer can capture the next tree
+        // right away, independent of whether the upload below succeeds.
+        const hadLocation = latitude != null;
+        speciesSelect.value = 'Cacao - Criolla'; // back to the default (first option)
+        document.getElementById('treeSpeciesOther').value = '';
+        onSpeciesChange(); // hides the "other" field again since it's back to Cacao
+        retakePhoto(); // clears capturedPhotoBlob, shows the live viewfinder again
+        statusEl.textContent = t('treeSavedOffline');
+        statusEl.className = 'success';
+        await updatePendingBadge();
+
+        // Try to flush right away — if online, this one (and any earlier
+        // queued ones) go out immediately and the status upgrades to "sent".
+        flushTreeReportQueue().then(() => {
+          if (!hadLocation) {
+            statusEl.textContent = statusEl.textContent + t('locationNote');
+          }
+        });
+      } catch (err) {
+        statusEl.textContent = t('treeError') + err.message;
+        statusEl.className = 'error';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ── init ─────────────────────────────────────────────────────────────
+    // ── nav dropdown ────────────────────────────────────────────────
+    function onNavChange() {
+      const select = document.getElementById('pageNav');
+      if (select.value === 'monitor') {
+        window.location.href = '/monitor-tree-growth/';
+      } else if (select.value === 'instrucoes') {
+        window.location.href = '/instrucoes/';
+      } else if (select.value === 'limites') {
+        window.location.href = '/limites-da-fazenda/';
+      } else {
+        window.location.href = '/';
+      }
+    }
+
+    setLang(currentLang);
+    requestLocation();
+    checkVerificationLink();
+    renderEmailSection();
+    updatePendingBadge();
+    flushTreeReportQueue(); // backfill anything queued from a previous offline session
+    window.addEventListener('online', flushTreeReportQueue);
+    // Auto-activate the camera viewport on page load.
+    startTreeCamera();
+  </script>
+
+  <!-- Offline support: network-first service worker (fresh by default, cached fallback offline) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+        .then(reg => console.log('Sunmint Service Worker registered:', reg.scope))
+        .catch(err => console.warn('Sunmint Service Worker registration failed:', err));
+    }
+  </script>
 </body>
 </html>

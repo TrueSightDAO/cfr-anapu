@@ -1,0 +1,27 @@
+{
+  "vendor_source_repo": "TrueSightDAO/sunmint_beta",
+  "vendor_source_ref": "main",
+  "vendor_target_repo": "TrueSightDAO/cfr-anapu",
+  "vendor_target_branch": "gh-pages",
+  "vendor_origin": "https://cfr.truesight.me",
+  "files": [
+    "index.html",
+    "monitor-tree-growth/index.html",
+    "limites-da-fazenda/index.html",
+    "instrucoes/index.html",
+    "instrucoes/send-as-file-tip.png",
+    "service-worker.js"
+  ],
+  "never_copy": ["CNAME"],
+  "og_url_rewrites": {
+    "index.html": ["https://sunmint.truesight.me/", "https://cfr.truesight.me/"],
+    "monitor-tree-growth/index.html": ["https://sunmint.truesight.me/monitor-tree-growth/", "https://cfr.truesight.me/monitor-tree-growth/"],
+    "instrucoes/index.html": ["https://sunmint.truesight.me/instrucoes/", "https://cfr.truesight.me/instrucoes/"]
+  },
+  "canonical_keep": [
+    "https://edgar.truesight.me",
+    "https://dapp.truesight.me",
+    "sunmint-android.apk",
+    "trees/index.geojson"
+  ]
+}
