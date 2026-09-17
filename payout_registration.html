@@ -83,6 +83,11 @@
       font-size: 0.82rem; line-height: 1.4; white-space: pre-wrap;
       word-break: break-word; max-height: 360px; overflow: auto;
     }
+    .lang-toggle { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .lang-toggle button { background: none; border: 1px solid #ccc; border-radius: 4px;
+      padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.9rem; color: #555;
+      width: auto; max-width: none; margin: 0; }
+    .lang-toggle button.active { background-color: #2e7d32; color: white; border-color: #2e7d32; }
     @media print {
       pre { white-space: pre-wrap !important; overflow: visible !important; max-height: none !important; }
     }
@@ -92,14 +97,18 @@
   </style>
 </head>
 <body>
+  <div class="lang-toggle">
+    <button id="langPt" class="active" onclick="setLang('pt')">Português</button>
+    <button id="langEn" onclick="setLang('en')">English</button>
+  </div>
   <div class="nav-dropdown">
-    <label for="pageNav">Page:</label>
+    <label for="pageNav" data-i18n="pageLabel">Page:</label>
     <select id="pageNav" onchange="onNavChange()">
-      <option value="plant">Plant Tree</option>
-      <option value="monitor">Monitor Tree</option>
-      <option value="limites">Farm Boundaries</option>
-      <option value="instrucoes">Instructions</option>
-      <option value="payout" selected>Register Payout</option>
+      <option value="plant" data-i18n="navPlant">Plant Tree</option>
+      <option value="monitor" data-i18n="navMonitor">Monitor Tree</option>
+      <option value="limites" data-i18n="navLimites">Farm Boundaries</option>
+      <option value="instrucoes" data-i18n="navInstrucoes">Instructions</option>
+      <option value="payout" selected data-i18n="navPayout">Register Payout</option>
     </select>
   </div>
   <div class="container">
@@ -107,14 +116,14 @@
     <div style="text-align: center;">
       <img id="logo" height="200px" src="https://github.com/TrueSightDAO/.github/blob/main/assets/20240612_truesight_dao_logo_square.png?raw=true" alt="TrueSightDAO Logo"/>
     </div>
-    <h1>Payout Registration</h1>
-    <p id="description" class="fade-in">
+    <h1 data-i18n="title">Payout Registration</h1>
+    <p id="description" class="fade-in" data-i18n-html="description">
       Register your PIX key <strong>once</strong> so the CRF Anapu tree-planting support
       (R$ 5.00 per tree) can be paid directly to you. We link it to the planting identity
       already saved on this device — no name or email needed.
     </p>
 
-    <div class="privacy-note">
+    <div class="privacy-note" data-i18n-html="privacyNote">
       <strong>Your PIX key is private.</strong> It is sent only to a restricted payout
       register — it is <em>never</em> written to the public DAO ledger. Please confirm the
       key carefully: a mistyped key means a payment that cannot be delivered.
@@ -125,27 +134,27 @@
     <input type="hidden" id="pkHash" value="">
 
     <div class="identity-box">
-      We will pay the planting identity on this device:
+      <span data-i18n="identityLabel">We will pay the planting identity on this device:</span>
       <span class="mono" id="identityValue">… checking …</span>
-      <div class="hint" style="margin:0.4rem 0 0;">
+      <div class="hint" style="margin:0.4rem 0 0;" data-i18n="identityHint">
         Derived from the public key saved by the planting app. It is not secret — it is the
         same identifier every tree you submit is attributed to.
       </div>
     </div>
 
-    <div class="identity-warning" id="identityWarning">
+    <div class="identity-warning" id="identityWarning" data-i18n-html="identityWarning">
       We could not find a planting identity on this device.
       <a href="/">Open the planting app on this device first</a>, then come back to this page.
     </div>
 
     <div class="input-group">
-      <label for="pixKey">Your PIX key</label>
-      <input type="text" id="pixKey" placeholder="CPF, CNPJ, email, phone (+55…) or random key" autocomplete="off">
+      <label for="pixKey" data-i18n="pixLabel">Your PIX key</label>
+      <input type="text" id="pixKey" data-i18n-placeholder="pixPlaceholder" placeholder="CPF, CNPJ, email, phone (+55…) or random key" autocomplete="off">
       <div class="hint" id="pixKeyTypeHint"></div>
     </div>
 
     <div class="button-container">
-      <button id="submitButton" type="button">Submit Payout Registration</button>
+      <button id="submitButton" type="button" data-i18n="submitButton">Submit Payout Registration</button>
     </div>
 
     <div id="status" class="fade-in" aria-live="polite"></div>
@@ -153,9 +162,9 @@
     <!-- §9b submission result rendering (adapted: the raw key is deliberately NOT
          echoed — see note below). -->
     <div id="submissionResult">
-      <h3>What we recorded (PIX key redacted for your privacy)</h3>
+      <h3 data-i18n="resultHeading">What we recorded (PIX key redacted for your privacy)</h3>
       <pre id="requestPre"></pre>
-      <h3>Register response</h3>
+      <h3 data-i18n="responseHeading">Register response</h3>
       <pre id="responsePre"></pre>
     </div>
   </div>
@@ -200,11 +209,11 @@
       $('pixKey').classList.remove('invalid');
       setStatus('');
       if (!f.pkHash.trim()) {
-        setStatus('We could not find your planting identity on this device. Please open the planting app on this device first, then return here.', 'error');
+        setStatus(t('errNoIdentity'), 'error');
         return null;
       }
       const v = U.validatePixKey(f.pixKey);
-      if (!v.valid) { $('pixKey').classList.add('invalid'); setStatus('PIX key problem: ' + v.reason, 'error'); return null; }
+      if (!v.valid) { $('pixKey').classList.add('invalid'); setStatus(t('errPixPrefix') + v.reason, 'error'); return null; }
       return f;
     }
 
@@ -216,7 +225,7 @@
       try { pub = localStorage.getItem('publicKey') || ''; } catch (_) { pub = ''; }
       if (!pub) {
         $('pkHash').value = '';
-        el.textContent = '(not found on this device)';
+        el.textContent = t('identityNotFound');
         warn.style.display = 'block';
         $('submitButton').disabled = true;
         return;
@@ -229,8 +238,8 @@
         $('submitButton').disabled = false;
       } catch (err) {
         $('pkHash').value = '';
-        el.textContent = '(unavailable)';
-        setStatus('Could not read your planting identity on this device: ' + err.message + '. Please open the planting app first.', 'error');
+        el.textContent = t('identityUnavailable');
+        setStatus(t('errReadPrefix') + err.message + t('errReadSuffix'), 'error');
         $('submitButton').disabled = true;
       }
     }
@@ -241,7 +250,7 @@
       const hint = $('pixKeyTypeHint');
       if (!val) { hint.textContent = ''; return; }
       const v = U.validatePixKey(val);
-      hint.textContent = v.valid ? ('Detected type: ' + v.type) : ('Not recognised: ' + v.reason);
+      hint.textContent = v.valid ? (t('hintDetected') + v.type) : (t('hintNotRecognised') + v.reason);
       if (v.valid) $('pixKey').classList.remove('invalid');
     });
 
@@ -258,13 +267,13 @@
       btn.disabled = true;
 
       if (!PAYOUT_SINK_URL) {
-        setStatus('Your PIX key was validated but NOT yet transmitted — the secure payout register is being provisioned. Please check back, or hand your key to a CRF coordinator in person.', 'error');
+        setStatus(t('notTransmitted'), 'error');
         btn.disabled = false;
         return;
       }
 
       try {
-        setStatus('Submitting…', 'loading');
+        setStatus(t('submitting'), 'loading');
         const resp = await fetch(PAYOUT_SINK_URL, {
           method: 'POST',
           body: JSON.stringify(U.buildPayoutRegistrationPayload(f)),
@@ -275,19 +284,96 @@
         try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch (_) {}
         $('responsePre').textContent = pretty;
         if (!resp.ok) throw new Error(text || ('HTTP ' + resp.status));
-        setStatus('Thank you — your PIX key was registered privately. You will not need to submit it again.', 'success');
+        setStatus(t('success'), 'success');
       } catch (err) {
-        setStatus('Could not reach the secure payout register: ' + err.message + '. Please try again, or hand your key to a CRF coordinator in person.', 'error');
+        setStatus(t('errReachPrefix') + err.message + t('errReachSuffix'), 'error');
       } finally {
         btn.disabled = false;
       }
     }
 
     $('submitButton').addEventListener('click', submit);
-    document.addEventListener('DOMContentLoaded', loadIdentity);
   </script>
 
   <script>
+    // ── i18n: PT/EN toggle, preference retained across CFR pages via localStorage
+    //    (shared key `sunmint_lang`, same convention as monitor-tree-growth/, /).
+    const I18N = {
+      pt: {
+        pageLabel: 'Página:',
+        navPlant: 'Plantar árvore', navMonitor: 'Monitorar árvore',
+        navLimites: 'Limites da fazenda', navInstrucoes: 'Instruções',
+        navPayout: 'Registrar pagamento',
+        title: 'Registro de pagamento',
+        description: 'Registre sua chave PIX <strong>uma vez</strong> para que o apoio ao plantio da CRF Anapu (R$ 5,00 por árvore) seja pago diretamente a você. Nós a vinculamos à identidade de plantio já salva neste dispositivo — sem nome nem e-mail.',
+        privacyNote: '<strong>Sua chave PIX é privada.</strong> Ela é enviada apenas a um registro de pagamento restrito — <em>nunca</em> é gravada no livro público da DAO. Confira a chave com atenção: uma chave errada significa um pagamento que não pode ser entregue.',
+        identityLabel: 'Pagaremos a identidade de plantio neste dispositivo:',
+        identityHint: 'Derivada da chave pública salva pelo aplicativo de plantio. Não é segredo — é o mesmo identificador ao qual cada árvore que você envia é atribuída.',
+        identityWarning: 'Não encontramos uma identidade de plantio neste dispositivo. <a href="/">Abra o aplicativo de plantio neste dispositivo primeiro</a> e volte a esta página.',
+        pixLabel: 'Sua chave PIX',
+        pixPlaceholder: 'CPF, CNPJ, e-mail, telefone (+55…) ou chave aleatória',
+        submitButton: 'Enviar registro de pagamento',
+        resultHeading: 'O que registramos (chave PIX ocultada para sua privacidade)',
+        responseHeading: 'Resposta do registro',
+        identityNotFound: '(não encontrada neste dispositivo)',
+        identityUnavailable: '(indisponível)',
+        errNoIdentity: 'Não encontramos sua identidade de plantio neste dispositivo. Abra o aplicativo de plantio aqui primeiro e depois volte.',
+        errPixPrefix: 'Problema na chave PIX: ',
+        errReadPrefix: 'Não foi possível ler sua identidade de plantio neste dispositivo: ',
+        errReadSuffix: '. Abra o aplicativo de plantio primeiro.',
+        hintDetected: 'Tipo detectado: ', hintNotRecognised: 'Não reconhecido: ',
+        notTransmitted: 'Sua chave PIX foi validada mas AINDA NÃO foi transmitida — o registro seguro de pagamento está sendo provisionado. Volte mais tarde ou entregue sua chave a um coordenador da CRF pessoalmente.',
+        submitting: 'Enviando…',
+        success: 'Obrigado — sua chave PIX foi registrada de forma privada. Você não precisará enviá-la novamente.',
+        errReachPrefix: 'Não foi possível acessar o registro seguro de pagamento: ',
+        errReachSuffix: '. Tente novamente ou entregue sua chave a um coordenador da CRF pessoalmente.'
+      },
+      en: {
+        pageLabel: 'Page:',
+        navPlant: 'Plant Tree', navMonitor: 'Monitor Tree',
+        navLimites: 'Farm Boundaries', navInstrucoes: 'Instructions',
+        navPayout: 'Register Payout',
+        title: 'Payout Registration',
+        description: 'Register your PIX key <strong>once</strong> so the CRF Anapu tree-planting support (R$ 5.00 per tree) can be paid directly to you. We link it to the planting identity already saved on this device — no name or email needed.',
+        privacyNote: '<strong>Your PIX key is private.</strong> It is sent only to a restricted payout register — it is <em>never</em> written to the public DAO ledger. Please confirm the key carefully: a mistyped key means a payment that cannot be delivered.',
+        identityLabel: 'We will pay the planting identity on this device:',
+        identityHint: 'Derived from the public key saved by the planting app. It is not secret — it is the same identifier every tree you submit is attributed to.',
+        identityWarning: 'We could not find a planting identity on this device. <a href="/">Open the planting app on this device first</a>, then come back to this page.',
+        pixLabel: 'Your PIX key',
+        pixPlaceholder: 'CPF, CNPJ, email, phone (+55…) or random key',
+        submitButton: 'Submit Payout Registration',
+        resultHeading: 'What we recorded (PIX key redacted for your privacy)',
+        responseHeading: 'Register response',
+        identityNotFound: '(not found on this device)',
+        identityUnavailable: '(unavailable)',
+        errNoIdentity: 'We could not find your planting identity on this device. Please open the planting app on this device first, then return here.',
+        errPixPrefix: 'PIX key problem: ',
+        errReadPrefix: 'Could not read your planting identity on this device: ',
+        errReadSuffix: '. Please open the planting app first.',
+        hintDetected: 'Detected type: ', hintNotRecognised: 'Not recognised: ',
+        notTransmitted: 'Your PIX key was validated but NOT yet transmitted — the secure payout register is being provisioned. Please check back, or hand your key to a CRF coordinator in person.',
+        submitting: 'Submitting…',
+        success: 'Thank you — your PIX key was registered privately. You will not need to submit it again.',
+        errReachPrefix: 'Could not reach the secure payout register: ',
+        errReachSuffix: '. Please try again, or hand your key to a CRF coordinator in person.'
+      }
+    };
+    // Same convention as monitor-tree-growth/: stored preference wins, else the
+    // browser's language decides (Brazilian students -> PT, everyone else -> EN).
+    const DEFAULT_LANG = (navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+    let currentLang = localStorage.getItem('sunmint_lang') || DEFAULT_LANG;
+    function t(key) { return (I18N[currentLang] && I18N[currentLang][key]) || I18N.pt[key] || key; }
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('sunmint_lang', lang);
+      document.documentElement.lang = lang;
+      document.getElementById('langPt').classList.toggle('active', lang === 'pt');
+      document.getElementById('langEn').classList.toggle('active', lang === 'en');
+      document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
+      document.querySelectorAll('[data-i18n-html]').forEach(function (el) { el.innerHTML = t(el.getAttribute('data-i18n-html')); });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder'))); });
+    }
+
     function onNavChange() {
       var v = document.getElementById('pageNav').value;
       if (v === 'plant') location.href = '/';
@@ -296,6 +382,11 @@
       else if (v === 'instrucoes') location.href = '/instrucoes/';
       else location.href = '/payout_registration.html';
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      setLang(currentLang);
+      if (typeof loadIdentity === 'function') loadIdentity();
+    });
   </script>
 </body>
 </html>
