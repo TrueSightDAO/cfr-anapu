@@ -60,6 +60,16 @@
       padding: 0.7rem 0.9rem; margin: 1rem 0; font-size: 0.85rem; color: #2e5a28; line-height: 1.5;
     }
     .privacy-note strong { color: #1b3d17; }
+    .identity-box {
+      background: #f0f4fb; border: 1px solid #cdd9ee; border-radius: 8px;
+      padding: 0.7rem 0.9rem; margin: 1rem 0; font-size: 0.9rem; color: #1f3355; line-height: 1.5;
+    }
+    .identity-box .mono { font-family: ui-monospace, SFMono-Regular, monospace; font-weight: bold; }
+    .identity-warning {
+      background: #fdf3e7; border: 1px solid #f0d5ad; border-radius: 8px;
+      padding: 0.7rem 0.9rem; margin: 1rem 0; font-size: 0.85rem; color: #7a4b12; line-height: 1.5; display: none;
+    }
+    .identity-warning a { color: #7a4b12; font-weight: bold; }
     button { padding: 0.8rem 1.5rem; cursor: pointer; font-size: 1.1rem; border: none; border-radius: 8px;
       background-color: #4CAF50; color: white; margin: 0.5rem 0; width: 100%; max-width: 300px; }
     button:hover { background-color: #45a049; }
@@ -100,55 +110,38 @@
     <h1>Payout Registration</h1>
     <p id="description" class="fade-in">
       Register your PIX key <strong>once</strong> so the CRF Anapu tree-planting support
-      (R$ 5.00 per tree) can be paid directly to you. You only need to do this once.
+      (R$ 5.00 per tree) can be paid directly to you. We link it to the planting identity
+      already saved on this device — no name or email needed.
     </p>
 
     <div class="privacy-note">
       <strong>Your PIX key is private.</strong> It is sent only to a restricted payout
       register — it is <em>never</em> written to the public DAO ledger. Please confirm the
       key carefully: a mistyped key means a payment that cannot be delivered.
-      If you have no PIX key, leave it blank and tell us how you can be paid instead.
+    </div>
+
+    <!-- Program is a fixed constant, never user-editable (hidden, not a visible input). -->
+    <input type="hidden" id="programSlug" value="crf-anapu">
+    <input type="hidden" id="pkHash" value="">
+
+    <div class="identity-box">
+      We will pay the planting identity on this device:
+      <span class="mono" id="identityValue">… checking …</span>
+      <div class="hint" style="margin:0.4rem 0 0;">
+        Derived from the public key saved by the planting app. It is not secret — it is the
+        same identifier every tree you submit is attributed to.
+      </div>
+    </div>
+
+    <div class="identity-warning" id="identityWarning">
+      We could not find a planting identity on this device.
+      <a href="/">Open the planting app on this device first</a>, then come back to this page.
     </div>
 
     <div class="input-group">
-      <label for="studentName">Your full name</label>
-      <input type="text" id="studentName" placeholder="e.g., Maria da Silva" autocomplete="name" required>
-
-      <label for="studentEmail">Your email (used to link you to your tree-planting records)</label>
-      <input type="email" id="studentEmail" placeholder="you@example.com" autocomplete="email" required>
-      <div class="hint">Use the same email you use on the SunMint planting app, so your trees and your payout match up.</div>
-
-      <label for="programSlug">Program</label>
-      <input type="text" id="programSlug" value="crf-anapu" readonly>
-
-      <label for="pixKeyType">PIX key type</label>
-      <select id="pixKeyType">
-        <option value="">Detect automatically</option>
-        <option value="CPF">CPF</option>
-        <option value="CNPJ">CNPJ</option>
-        <option value="EMAIL">Email</option>
-        <option value="PHONE">Phone</option>
-        <option value="EVP">Random key (EVP)</option>
-      </select>
-
-      <label for="pixKey">PIX key</label>
+      <label for="pixKey">Your PIX key</label>
       <input type="text" id="pixKey" placeholder="CPF, CNPJ, email, phone (+55…) or random key" autocomplete="off">
-      <div class="hint">Leave blank if you have no PIX key — see below.</div>
-
-      <label for="accountHolder">Whose PIX account is this?</label>
-      <input type="text" id="accountHolder" placeholder="Name on the account (if not yours)">
-      <div class="hint">If you are under 18 and the key belongs to a parent or guardian, enter their name.</div>
-
-      <label for="relationship">Relationship to you</label>
-      <select id="relationship">
-        <option value="self">It is my own account</option>
-        <option value="parent">Parent</option>
-        <option value="guardian">Guardian</option>
-        <option value="other">Other</option>
-      </select>
-
-      <label for="noKeyChannel">No PIX key? How can you be paid?</label>
-      <input type="text" id="noKeyChannel" placeholder="e.g., guardian's bank account / in person">
+      <div class="hint" id="pixKeyTypeHint"></div>
     </div>
 
     <div class="button-container">
@@ -189,46 +182,67 @@
     function $(id) { return document.getElementById(id); }
     function setStatus(msg, cls) { const s = $('status'); s.textContent = msg; s.className = cls || ''; }
 
+    // The one thing this form records: which planting identity (public key) maps
+    // to which PIX key. The identity is derived from this device's saved public
+    // key -- never typed by the user.
     function currentFields() {
       return {
-        studentName: $('studentName').value,
-        studentEmail: $('studentEmail').value,
-        pkHash: '', // optional: filled from localStorage identity if present
+        pkHash: $('pkHash').value,
         programSlug: $('programSlug').value,
-        pixKeyType: $('pixKeyType').value,
+        pixKeyType: '',               // auto-detected from the key shape
         pixKey: $('pixKey').value,
-        accountHolder: $('accountHolder').value,
-        relationship: $('relationship').value,
-        noKeyChannel: $('noKeyChannel').value,
         submissionSource: SUBMISSION_SOURCE
       };
     }
 
     function validate() {
       const f = currentFields();
-      ['studentName', 'studentEmail', 'pixKey'].forEach(function (id) { $(id).classList.remove('invalid'); });
+      $('pixKey').classList.remove('invalid');
       setStatus('');
-      if (!f.studentName.trim()) { $('studentName').classList.add('invalid'); setStatus('Please enter your full name.', 'error'); return null; }
-      if (!U.isValidEmail(f.studentEmail)) { $('studentEmail').classList.add('invalid'); setStatus('Please enter a valid email address.', 'error'); return null; }
-      if (f.pixKey.trim()) {
-        const v = U.validatePixKey(f.pixKey);
-        if (!v.valid) { $('pixKey').classList.add('invalid'); setStatus('PIX key problem: ' + v.reason, 'error'); return null; }
-      } else if (!f.noKeyChannel.trim()) {
-        setStatus('Enter a PIX key, or tell us how you can be paid instead.', 'error'); return null;
+      if (!f.pkHash.trim()) {
+        setStatus('We could not find your planting identity on this device. Please open the planting app on this device first, then return here.', 'error');
+        return null;
       }
+      const v = U.validatePixKey(f.pixKey);
+      if (!v.valid) { $('pixKey').classList.add('invalid'); setStatus('PIX key problem: ' + v.reason, 'error'); return null; }
       return f;
     }
 
-    // Live PIX-key feedback (type + masked echo), no raw key shown.
+    // Derive the planting identity (pk_hash) from the device's saved public key.
+    async function loadIdentity() {
+      const el = $('identityValue');
+      const warn = $('identityWarning');
+      let pub = '';
+      try { pub = localStorage.getItem('publicKey') || ''; } catch (_) { pub = ''; }
+      if (!pub) {
+        $('pkHash').value = '';
+        el.textContent = '(not found on this device)';
+        warn.style.display = 'block';
+        $('submitButton').disabled = true;
+        return;
+      }
+      try {
+        const h = await U.derivePkHash(pub);
+        $('pkHash').value = h;
+        el.textContent = U.maskPkHash(h);
+        warn.style.display = 'none';
+        $('submitButton').disabled = false;
+      } catch (err) {
+        $('pkHash').value = '';
+        el.textContent = '(unavailable)';
+        setStatus('Could not read your planting identity on this device: ' + err.message + '. Please open the planting app first.', 'error');
+        $('submitButton').disabled = true;
+      }
+    }
+
+    // Live PIX-key feedback (detected type), no raw key echoed back.
     $('pixKey').addEventListener('input', function () {
       const val = $('pixKey').value.trim();
-      const fb = $('pixKeyType');
-      if (!val) { return; }
+      const hint = $('pixKeyTypeHint');
+      if (!val) { hint.textContent = ''; return; }
       const v = U.validatePixKey(val);
-      if (v.valid) {
-        $('pixKey').classList.remove('invalid');
-        if (!fb.value) fb.value = v.type;
-      }
+      hint.textContent = v.valid ? ('Detected type: ' + v.type) : ('Not recognised: ' + v.reason);
+      if (v.valid) $('pixKey').classList.remove('invalid');
     });
 
     async function submit() {
@@ -270,6 +284,7 @@
     }
 
     $('submitButton').addEventListener('click', submit);
+    document.addEventListener('DOMContentLoaded', loadIdentity);
   </script>
 
   <script>

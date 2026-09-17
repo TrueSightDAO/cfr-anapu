@@ -10,16 +10,23 @@
  * Anything submitted to Edgar (`/dao/submit_contribution`) lands in the
  * Telegram Chat Logs intake and is republished as a PUBLIC raw chatlog
  * (truesight.me/submissions/raw-telegram-chatlogs). A raw PIX key therefore
- * MUST NEVER travel inside an Edgar-signed payload.
+ * must NEVER go to Edgar. It goes ONLY to the restricted payout sink
+ * (see buildPayoutRegistrationPayload), and buildRedactedSummary() is the only
+ * shape safe to show / forward publicly.
  *
- * This module only ever:
- *   1. validates a PIX key locally,
- *   2. classifies its type (CPF | CNPJ | EMAIL | PHONE | EVP),
- *   3. MASKS it for on-screen display / echo.
- *
- * The raw key travels ONLY to the dedicated PRIVATE sink
- * (PAYOUT_SINK_URL in payout_registration.html) and is never echoed in full.
  * ---------------------------------------------------------------------------
+ * IDENTITY CONTRACT.
+ *
+ * This form does ONE thing: bind the planter's public key (already held on
+ * their device by the planting app) to their PIX key. The public key is never
+ * typed by the user -- it is read from localStorage and hashed into the same
+ * `pk_hash` the DAO already attributes every tree submission to. Name and
+ * email are deliberately NOT collected: the public key IS the identity.
+ *
+ *   pk_hash = 'pk-' + base64url(sha256(spki(publicKey)))[:12]
+ *
+ * This matches the server-side convention in
+ * program_admin_endpoint.js::paDerivePkHash.
  */
 (function (global) {
     'use strict';
@@ -130,24 +137,82 @@
         return '****' + s.slice(-4);
     }
 
+    // --- pk_hash (identity) ------------------------------------------------
+
+    /** base64 -> Uint8Array (browser atob, Node Buffer). */
+    function base64ToBytes(b64) {
+        var s = _str(b64).trim().replace(/\s+/g, '');
+        if (typeof atob === 'function') {
+            var bin = atob(s);
+            var out = new Uint8Array(bin.length);
+            for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+            return out;
+        }
+        return new Uint8Array(Buffer.from(s, 'base64'));
+    }
+
+    /** Uint8Array -> unpadded base64url (the DAO's pk_hash alphabet). */
+    function bytesToBase64Url(u8) {
+        var b64;
+        if (typeof btoa === 'function') {
+            var bin = '';
+            for (var i = 0; i < u8.length; i++) bin += String.fromCharCode(u8[i]);
+            b64 = btoa(bin);
+        } else {
+            b64 = Buffer.from(u8).toString('base64');
+        }
+        return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    /** Format a raw SHA-256 digest as the DAO's pk_hash identifier. */
+    function pkHashFromSha256(sha256Bytes) {
+        return 'pk-' + bytesToBase64Url(sha256Bytes).slice(0, 12);
+    }
+
+    /**
+     * Derive pk_hash from a base64 SPKI public key (as stored by the planting
+     * app in localStorage['publicKey']). Async (WebCrypto digest).
+     */
+    async function derivePkHash(publicKeyBase64) {
+        var b64 = _str(publicKeyBase64).trim();
+        if (!b64) return '';
+        var der = base64ToBytes(b64);
+        var subtle = (typeof crypto !== 'undefined' && crypto && crypto.subtle) ||
+                     (global && global.crypto && global.crypto.subtle) || null;
+        if (!subtle) throw new Error('WebCrypto unavailable');
+        var digest = await subtle.digest('SHA-256', der);
+        return pkHashFromSha256(new Uint8Array(digest));
+    }
+
+    /** pk_hash is a non-secret public identifier; show a short confirmation form. */
+    function maskPkHash(value) {
+        var s = _str(value).trim();
+        if (!s) return '';
+        if (s.length <= 10) return s;
+        return s.slice(0, 7) + '…' + s.slice(-4);
+    }
+
+    function isValidPkHash(value) {
+        return /^pk-[A-Za-z0-9_-]{12}$/.test(_str(value).trim());
+    }
+
     /**
      * The object written to the PRIVATE sink. This is the ONLY place a raw
      * pix_key is carried -- it must never be passed to Edgar.
+     *
+     * Minimal by design: the planter's public key (pk_hash) + PIX key + program.
+     * Name / email / account-holder / relationship / no-key-channel are NOT
+     * collected any more.
      */
     function buildPayoutRegistrationPayload(fields) {
         fields = fields || {};
         var key = _str(fields.pixKey).trim();
         return {
-            student_name: _str(fields.studentName).trim(),
-            student_email: _str(fields.studentEmail).trim().toLowerCase(),
             pk_hash: _str(fields.pkHash).trim(),
             program_slug: _str(fields.programSlug).trim(),
             pix_key_type: fields.pixKeyType || detectPixKeyType(key),
             pix_key: key,
-            account_holder: _str(fields.accountHolder).trim(),
-            relationship: _str(fields.relationship).trim() || 'self',
             has_key: Boolean(key),
-            no_key_channel: _str(fields.noKeyChannel).trim(),
             submission_source: _str(fields.submissionSource).trim()
         };
     }
@@ -163,11 +228,10 @@
         var key = _str(fields.pixKey).trim();
         return [
             '[PAYOUT REGISTRATION]',
-            '- Student: ' + _str(fields.studentName).trim(),
+            '- Planting identity (pk_hash): ' + (maskPkHash(fields.pkHash) || '(none)'),
             '- Program: ' + _str(fields.programSlug).trim(),
             '- PIX key type: ' + (t || '(none)'),
-            '- PIX key: ' + (key ? maskPixKey(key, t) : (fields.noKeyChannel ? '(none - ' + _str(fields.noKeyChannel).trim() + ')' : '(not provided)')),
-            '- Account holder relationship: ' + (_str(fields.relationship).trim() || 'self'),
+            '- PIX key: ' + (key ? maskPixKey(key, t) : '(not provided)'),
             '--------'
         ].join('\n');
     }
@@ -182,6 +246,12 @@
         detectPixKeyType: detectPixKeyType,
         validatePixKey: validatePixKey,
         maskPixKey: maskPixKey,
+        base64ToBytes: base64ToBytes,
+        bytesToBase64Url: bytesToBase64Url,
+        pkHashFromSha256: pkHashFromSha256,
+        derivePkHash: derivePkHash,
+        maskPkHash: maskPkHash,
+        isValidPkHash: isValidPkHash,
         buildPayoutRegistrationPayload: buildPayoutRegistrationPayload,
         buildRedactedSummary: buildRedactedSummary
     };
