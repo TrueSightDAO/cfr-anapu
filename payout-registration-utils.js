@@ -9,10 +9,13 @@
  * A PIX key is frequently a CPF or CNPJ, i.e. a Brazilian national tax id.
  * Anything submitted to Edgar (`/dao/submit_contribution`) lands in the
  * Telegram Chat Logs intake and is republished as a PUBLIC raw chatlog
- * (truesight.me/submissions/raw-telegram-chatlogs). A raw PIX key therefore
- * must NEVER go to Edgar. It goes ONLY to the restricted payout sink
- * (see buildPayoutRegistrationPayload), and buildRedactedSummary() is the only
- * shape safe to show / forward publicly.
+ * (truesight.me/submissions/raw-telegram-chatlogs). Under
+ * CRF_ANAPU_SUNMINT_COHORT_PROPOSAL.md 11.6 the raw key IS submitted to Edgar as
+ * a signed [PAYOUT REGISTRATION] event -- but by LOCATION, not encryption
+ * (11.2): the Telegram Chat Logs intake is governor-only (2026-09-18) and the
+ * event is excluded from every public JSON cache (11.4), so the raw key never
+ * reaches a public surface. buildRedactedSummary() remains the ONLY shape safe
+ * to show on-screen or forward publicly.
  *
  * ---------------------------------------------------------------------------
  * IDENTITY CONTRACT.
@@ -204,6 +207,21 @@
      * Name / email / account-holder / relationship / no-key-channel are NOT
      * collected any more.
      */
+    function buildPayoutRegistrationEventText(fields) {
+        fields = fields || {};
+        var key = _str(fields.pixKey).trim();
+        var t = fields.pixKeyType || detectPixKeyType(key);
+        return [
+            '[PAYOUT REGISTRATION]',
+            '- Planting identity (pk_hash): ' + _str(fields.pkHash).trim(),
+            '- Program: ' + _str(fields.programSlug).trim(),
+            '- PIX key type: ' + (t || ''),
+            '- PIX key: ' + key,
+            '- Submission Source: ' + _str(fields.submissionSource).trim(),
+            '--------'
+        ].join('\n');
+    }
+
     function buildPayoutRegistrationPayload(fields) {
         fields = fields || {};
         var key = _str(fields.pixKey).trim();
@@ -253,6 +271,7 @@
         maskPkHash: maskPkHash,
         isValidPkHash: isValidPkHash,
         buildPayoutRegistrationPayload: buildPayoutRegistrationPayload,
+        buildPayoutRegistrationEventText: buildPayoutRegistrationEventText,
         buildRedactedSummary: buildRedactedSummary
     };
 

@@ -165,6 +165,31 @@ test('PRIVACY: redacted summary of an email key never leaks the local part', () 
     assert.ok(s.includes('m***@example.com'));
 });
 
+// --- Edgar event text (the section-11.6 transport) --------------------------
+test('buildPayoutRegistrationEventText carries the RAW key + sink-parseable shape', () => {
+    const raw = '111.444.777-35';
+    const t = u.buildPayoutRegistrationEventText({
+        pkHash: 'pk-abcdefghijkl', programSlug: 'crf-anapu', pixKey: raw,
+        submissionSource: 'https://cfr.truesight.me/payout_registration.html'
+    });
+    assert.ok(t.startsWith('[PAYOUT REGISTRATION]'), 'tag must be first line');
+    assert.ok(t.includes('- PIX key: ' + raw), 'raw key must be present in event text');
+    assert.ok(t.includes('- Planting identity (pk_hash): pk-abcdefghijkl'));
+    assert.ok(t.includes('- Program: crf-anapu'));
+    assert.ok(t.includes('- PIX key type: CPF'));
+    assert.ok(t.trimEnd().endsWith('--------'), 'must terminate with the field separator');
+});
+
+test('PROVENANCE-LAST: submission_source is the last field before --------', () => {
+    const t = u.buildPayoutRegistrationEventText({
+        pkHash: 'pk-abcdefghijkl', programSlug: 'crf-anapu', pixKey: '111.444.777-35',
+        submissionSource: 'https://cfr.truesight.me/payout_registration.html'
+    });
+    const lines = t.split('\n');
+    const sep = lines.indexOf('--------');
+    assert.ok(/^\- Submission Source: /.test(lines[sep - 1]), 'last field must be Submission Source, got: ' + lines[sep - 1]);
+});
+
 (async function run() {
     for (const [name, fn] of queue) {
         try { await fn(); passed++; console.log('  ok  ' + name); }
