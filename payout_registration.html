@@ -184,9 +184,51 @@
     // this page validates + redacts locally and tells the student their key was
     // NOT yet transmitted, rather than leaking it anywhere.
     // ---------------------------------------------------------------------------
-    const PAYOUT_SINK_URL = ''; // e.g. 'https://script.google.com/macros/s/AKfy…/exec'
+    const EDGAR_BASE = 'https://edgar.truesight.me';
+    const EDGAR_SUBMIT_URL = `${EDGAR_BASE}/dao/submit_contribution`;
     const SUBMISSION_SOURCE = window.location.href;
     const U = window.PayoutRegistrationUtils;
+
+    // ---- RSA identity + signing (same scheme as dapp/create_signature.html) ----
+    function arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      return window.btoa(binary);
+    }
+    function base64ToArrayBuffer(base64) {
+      const binary = window.atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return bytes.buffer;
+    }
+    // Reuse the planting app's keypair when present (the same identity that signs
+    // tree submissions); generate + persist one otherwise so the event still
+    // attributes to a stable pk_hash.
+    async function ensureKeyPair() {
+      let publicKey = localStorage.getItem('publicKey');
+      let privateKey = localStorage.getItem('privateKey');
+      if (publicKey && privateKey) return { publicKey, privateKey };
+      const keyPair = await window.crypto.subtle.generateKey(
+        { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+        true, ['sign', 'verify']
+      );
+      publicKey = arrayBufferToBase64(await window.crypto.subtle.exportKey('spki', keyPair.publicKey));
+      privateKey = arrayBufferToBase64(await window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey));
+      localStorage.setItem('publicKey', publicKey);
+      localStorage.setItem('privateKey', privateKey);
+      return { publicKey, privateKey };
+    }
+    async function signText(privateKeyBase64, text) {
+      const privateKeyObj = await window.crypto.subtle.importKey(
+        'pkcs8', base64ToArrayBuffer(privateKeyBase64),
+        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']
+      );
+      const signature = await window.crypto.subtle.sign(
+        'RSASSA-PKCS1-v1_5', privateKeyObj, new TextEncoder().encode(text)
+      );
+      return arrayBufferToBase64(signature);
+    }
 
     function $(id) { return document.getElementById(id); }
     function setStatus(msg, cls) { const s = $('status'); s.textContent = msg; s.className = cls || ''; }
@@ -266,24 +308,23 @@
       $('submissionResult').style.display = 'block';
       btn.disabled = true;
 
-      if (!PAYOUT_SINK_URL) {
-        setStatus(t('notTransmitted'), 'error');
-        btn.disabled = false;
-        return;
-      }
-
       try {
         setStatus(t('submitting'), 'loading');
-        const resp = await fetch(PAYOUT_SINK_URL, {
-          method: 'POST',
-          body: JSON.stringify(U.buildPayoutRegistrationPayload(f)),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' } // avoids GAS CORS preflight
-        });
-        const text = await resp.text();
-        let pretty = text;
-        try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch (_) {}
-        $('responsePre').textContent = pretty;
-        if (!resp.ok) throw new Error(text || ('HTTP ' + resp.status));
+        // Build the signed [PAYOUT REGISTRATION] event and submit via Edgar.
+        const { publicKey, privateKey } = await ensureKeyPair();
+        const requestText = U.buildPayoutRegistrationEventText(f);
+        const signature = await signText(privateKey, requestText);
+        const shareText = `${requestText}\n\nMy Digital Signature: ${publicKey}\n\nRequest Transaction ID: ${signature}\n\nThis submission was generated using ${window.location.href}\n\nVerify submission here: https://dapp.truesight.me/verify_request.html`;
+
+        const formData = new FormData();
+        formData.append('text', shareText);
+        const resp = await fetch(EDGAR_SUBMIT_URL, { method: 'POST', body: formData });
+        const rawText = await resp.text();
+        let data = {};
+        try { data = rawText ? JSON.parse(rawText) : {}; } catch (_) { data = {}; }
+        // Echo only the server response -- never the raw key.
+        $('responsePre').textContent = JSON.stringify(data, null, 2);
+        if (!resp.ok) throw new Error((data && data.error) || rawText || ('HTTP ' + resp.status));
         setStatus(t('success'), 'success');
       } catch (err) {
         setStatus(t('errReachPrefix') + err.message + t('errReachSuffix'), 'error');
