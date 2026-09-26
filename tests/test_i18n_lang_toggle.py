@@ -26,6 +26,7 @@ CFR_PAGES = [
     "limites-da-fazenda/index.html",
     "monitor-tree-growth/index.html",
     "payout_registration.html",
+    "my-trees/index.html",
 ]
 
 
