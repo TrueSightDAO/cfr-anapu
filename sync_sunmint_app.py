@@ -6,7 +6,8 @@ Option B of plans/CRF_ANAPU_SUNMINT_COHORT_PROPOSAL.md: a full vendor copy so th
 URL bar stays on cfr.truesight.me and every submission self-attributes via
 `Submission Source: ${window.location.href}` -- zero app-code change.
 
-DRY-RUN BY DEFAULT. Pass --open-pr to branch, commit, push and open a PR.
+DRY-RUN BY DEFAULT. Pass --open-pr to vendor the files into --root; the
+branch/commit/push/PR step is done by the operator (see README).
 Never copies the app's CNAME (the vendor keeps cfr.truesight.me).
 Reads vendor.json next to this script for the file list + rewrite rules.
 """
@@ -76,11 +77,20 @@ def main():
     tree = build(a.root, c)
     for rel in sorted(tree):
         print(f"  {len(tree[rel]):8d}  {rel}")
-    print(f"[{'DRY-RUN' if not a.open_pr else 'OPEN-PR'}] {len(tree)} files -> {a.root}")
     if not a.open_pr:
-        print("dry-run only; pass --open-pr to branch/commit/push/open PR")
+        print(f"[DRY-RUN] {len(tree)} files would be written to {a.root}")
+        print("dry-run only; pass --open-pr to write them")
         return
-    print("open-pr path requires git auth on the operator box; see README.")
+    # Actually materialise the vendored tree. Without this the tool merely
+    # printed sizes and wrote nothing, so every "sync" had to be re-done by
+    # hand (and could silently diverge from the manifest).
+    for rel, data in tree.items():
+        dest = os.path.join(a.root, rel)
+        os.makedirs(os.path.dirname(dest) or a.root, exist_ok=True)
+        with open(dest, "wb") as fh:
+            fh.write(data)
+    print(f"[WRITE] {len(tree)} files written to {a.root}")
+    print("next: git add/commit/push and open the PR (see README)")
 
 
 if __name__ == "__main__":
