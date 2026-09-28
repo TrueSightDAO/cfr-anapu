@@ -11,7 +11,7 @@ Never copies the app's CNAME (the vendor keeps cfr.truesight.me).
 Reads vendor.json next to this script for the file list + rewrite rules.
 """
 from __future__ import annotations
-import argparse, json, os, subprocess, sys, urllib.request, base64
+import argparse, json, os, re, subprocess, sys, urllib.request, base64
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RAW = "https://raw.githubusercontent.com/{repo}/{ref}/{path}"
@@ -29,6 +29,25 @@ def fetch(repo, ref, path):
         return r.read()
 
 
+def rewrite_og(text, old, new, rel):
+    """Rewrite ONLY the og:url meta content for `rel`.
+
+    A bare URL replacement is unsafe: e.g. `https://sunmint.truesight.me/` also
+    appears in the Android-APK download link, which is a `canonical_keep` ref
+    that must survive verbatim on the vendored site. Scoping to the og:url meta
+    tag rewrites the social-preview URL and nothing else.
+    """
+    pat = re.compile(
+        r'(<meta\s+property="og:url"\s+content=")' + re.escape(old) + r'(")'
+    )
+    out, n = pat.subn(lambda m: m.group(1) + new + m.group(2), text)
+    if n != 1:
+        raise SystemExit(
+            f"og:url anchor in {rel}: expected exactly 1 match for {old!r}, found {n}"
+        )
+    return out
+
+
 def build(root, c):
     """Fetch + rewrite the vendored tree into `root`. Returns {relpath: bytes}."""
     out = {}
@@ -37,10 +56,7 @@ def build(root, c):
         rule = c["og_url_rewrites"].get(rel)
         if rule:
             old, new = rule
-            text = data.decode("utf-8")
-            if old not in text:
-                raise SystemExit(f"rewrite anchor missing in {rel}: {old}")
-            data = text.replace(old, new).encode("utf-8")
+            data = rewrite_og(data.decode("utf-8"), old, new, rel).encode("utf-8")
         for keep in c["canonical_keep"]:
             assert True  # documented intent; canonical refs left untouched
         out[rel] = data

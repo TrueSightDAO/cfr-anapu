@@ -243,6 +243,7 @@
       <option value="limites" data-i18n="navLimites">Limites da Fazenda</option>
       <option value="instrucoes" data-i18n="navInstrucoes">Instruções</option>
       <option value="payout" data-i18n="navPayout">Registrar Pagamento</option>
+      <option value="myTrees" data-i18n="navMyTrees">Minhas \u00c1rvores</option>
     </select>
   </div>
 
@@ -331,8 +332,7 @@
         navPlant: "Registrar Plantio",
         navMonitor: "Monitorar Árvore",
         navInstrucoes: "Instruções",
-        navLimites: "Limites da Fazenda",
-        navPayout: "Registrar Pagamento",
+        navLimites: "Limites da Fazenda", navPayout:"Registrar Pagamento", navMyTrees: "Minhas \u00c1rvores",
         downloadHeading: "Baixe o aplicativo Android",
         downloadHint: "Prefere o aplicativo nativo? Funciona sem internet e salva os registros no seu celular.",
         downloadButton: "Baixar APK (Android)",
@@ -384,6 +384,7 @@
         locationNote: " (localização não disponível)",
         pendingSingular: "1 registro pendente de envio (sem internet no momento).",
         pendingPlural: " registros pendentes de envio (sem internet no momento).",
+        pendingSyncing: "Sincronizando registros pendentes...",
         pendingUploading: "Enviando registros pendentes...",
         pendingUploaded: "Registro(s) pendente(s) enviado(s) com sucesso!",
         pendingPhotoPending: "Relatório enviado, mas a foto não foi salva no servidor. Vou tentar de novo.",
@@ -394,8 +395,7 @@
         navPlant: "Plant Tree",
         navMonitor: "Monitor Tree",
         navInstrucoes: "Instructions",
-        navLimites: "Farm Boundaries",
-        navPayout: "Register Payout",
+        navLimites: "Farm Boundaries", navPayout:"Register Payout", navMyTrees: "My Trees",
         downloadHeading: "Download the Android app",
         downloadHint: "Prefer the native app? It works offline and saves your reports on your phone.",
         downloadButton: "Download APK (Android)",
@@ -447,6 +447,7 @@
         locationNote: " (location not available)",
         pendingSingular: "1 report pending upload (no internet right now).",
         pendingPlural: " reports pending upload (no internet right now).",
+        pendingSyncing: "Syncing pending records...",
         pendingUploading: "Uploading pending reports...",
         pendingUploaded: "Pending report(s) uploaded successfully!",
         pendingPhotoPending: "Report sent, but the photo wasn't stored on the server. I'll retry.",
@@ -766,6 +767,10 @@
       return data;
     }
 
+    // True while flushTreeReportQueue() is actively uploading queued reports,
+    // so the badge can say "Syncing..." instead of the stale "no internet" hint.
+    let flushInProgress = false;
+
     async function updatePendingBadge() {
       const badge = document.getElementById('pendingBadge');
       try {
@@ -775,9 +780,11 @@
           return;
         }
         badge.style.display = 'block';
-        badge.textContent = pending.length === 1
-          ? t('pendingSingular')
-          : pending.length + t('pendingPlural');
+        badge.textContent = flushInProgress
+          ? t('pendingSyncing')
+          : (pending.length === 1
+              ? t('pendingSingular')
+              : pending.length + t('pendingPlural'));
       } catch (_) { /* IndexedDB unavailable — badge just stays hidden */ }
     }
 
@@ -793,6 +800,11 @@
         return;
       }
       if (pending.length === 0) return;
+
+      // Surface the background upload in the UI immediately (page refresh with a
+      // queued report used to show nothing until the flush finished).
+      flushInProgress = true;
+      await updatePendingBadge();
 
       const statusEl = document.getElementById('treeStatus');
       statusEl.textContent = t('pendingUploading');
@@ -830,6 +842,7 @@
       if (uploadedCount > 0 && lastResult) {
         renderSubmissionResult(pending[pending.length - 1].shareText, lastResult);
       }
+      flushInProgress = false;
       await updatePendingBadge();
     }
 
@@ -1160,6 +1173,8 @@
         window.location.href = '/instrucoes/';
       } else if (select.value === 'limites') {
         window.location.href = '/limites-da-fazenda/';
+      } else if (select.value === 'myTrees') {
+        window.location.href = '/my-trees/';
       } else {
         window.location.href = '/';
       }
