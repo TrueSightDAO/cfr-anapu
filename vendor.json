@@ -2,7 +2,7 @@
   "vendor_source_repo": "TrueSightDAO/sunmint_beta",
   "vendor_source_ref": "main",
   "vendor_target_repo": "TrueSightDAO/cfr-anapu",
-  "vendor_target_branch": "gh-pages",
+  "vendor_target_branch": "main",
   "vendor_origin": "https://cfr.truesight.me",
   "files": [
     "index.html",
@@ -10,7 +10,16 @@
     "limites-da-fazenda/index.html",
     "instrucoes/index.html",
     "instrucoes/send-as-file-tip.png",
-    "service-worker.js"
+    "service-worker.js",
+    "my-trees/index.html",
+    "my-trees-utils.js",
+    "payout-registration-utils.js",
+    "tests/my-trees-utils.test.js",
+    "tests/payout-registration-utils.test.js",
+    "tests/test_my_trees_i18n.py",
+    "tests/test_nav_ui_convention.py",
+    "tests/test_photo_upload_guard.py",
+    "tests/test_submission_source_origin.py"
   ],
   "never_copy": ["CNAME"],
   "og_url_rewrites": {

@@ -9,27 +9,17 @@
  * A PIX key is frequently a CPF or CNPJ, i.e. a Brazilian national tax id.
  * Anything submitted to Edgar (`/dao/submit_contribution`) lands in the
  * Telegram Chat Logs intake and is republished as a PUBLIC raw chatlog
- * (truesight.me/submissions/raw-telegram-chatlogs). Under
- * CRF_ANAPU_SUNMINT_COHORT_PROPOSAL.md 11.6 the raw key IS submitted to Edgar as
- * a signed [PAYOUT REGISTRATION] event -- but by LOCATION, not encryption
- * (11.2): the Telegram Chat Logs intake is governor-only (2026-09-18) and the
- * event is excluded from every public JSON cache (11.4), so the raw key never
- * reaches a public surface. buildRedactedSummary() remains the ONLY shape safe
- * to show on-screen or forward publicly.
+ * (truesight.me/submissions/raw-telegram-chatlogs). A raw PIX key therefore
+ * MUST NEVER travel inside an Edgar-signed payload.
  *
+ * This module only ever:
+ *   1. validates a PIX key locally,
+ *   2. classifies its type (CPF | CNPJ | EMAIL | PHONE | EVP),
+ *   3. MASKS it for on-screen display / echo.
+ *
+ * The raw key travels ONLY to the dedicated PRIVATE sink
+ * (PAYOUT_SINK_URL in payout_registration.html) and is never echoed in full.
  * ---------------------------------------------------------------------------
- * IDENTITY CONTRACT.
- *
- * This form does ONE thing: bind the planter's public key (already held on
- * their device by the planting app) to their PIX key. The public key is never
- * typed by the user -- it is read from localStorage and hashed into the same
- * `pk_hash` the DAO already attributes every tree submission to. Name and
- * email are deliberately NOT collected: the public key IS the identity.
- *
- *   pk_hash = 'pk-' + base64url(sha256(spki(publicKey)))[:12]
- *
- * This matches the server-side convention in
- * program_admin_endpoint.js::paDerivePkHash.
  */
 (function (global) {
     'use strict';
@@ -140,6 +130,48 @@
         return '****' + s.slice(-4);
     }
 
+    /**
+     * The object written to the PRIVATE sink. This is the ONLY place a raw
+     * pix_key is carried -- it must never be passed to Edgar.
+     */
+    function buildPayoutRegistrationPayload(fields) {
+        fields = fields || {};
+        var key = _str(fields.pixKey).trim();
+        return {
+            student_name: _str(fields.studentName).trim(),
+            student_email: _str(fields.studentEmail).trim().toLowerCase(),
+            pk_hash: _str(fields.pkHash).trim(),
+            program_slug: _str(fields.programSlug).trim(),
+            pix_key_type: fields.pixKeyType || detectPixKeyType(key),
+            pix_key: key,
+            account_holder: _str(fields.accountHolder).trim(),
+            relationship: _str(fields.relationship).trim() || 'self',
+            has_key: Boolean(key),
+            no_key_channel: _str(fields.noKeyChannel).trim(),
+            submission_source: _str(fields.submissionSource).trim()
+        };
+    }
+
+    /**
+     * A public-safe, redacted summary. Deliberately carries NO raw key, so it
+     * is safe to display, forward to a governor, or (if ever) attach to any
+     * public-facing record.
+     */
+    function buildRedactedSummary(fields) {
+        fields = fields || {};
+        var t = fields.pixKeyType || detectPixKeyType(fields.pixKey);
+        var key = _str(fields.pixKey).trim();
+        return [
+            '[PAYOUT REGISTRATION]',
+            '- Student: ' + _str(fields.studentName).trim(),
+            '- Program: ' + _str(fields.programSlug).trim(),
+            '- PIX key type: ' + (t || '(none)'),
+            '- PIX key: ' + (key ? maskPixKey(key, t) : (fields.noKeyChannel ? '(none - ' + _str(fields.noKeyChannel).trim() + ')' : '(not provided)')),
+            '- Account holder relationship: ' + (_str(fields.relationship).trim() || 'self'),
+            '--------'
+        ].join('\n');
+    }
+
     // --- pk_hash (identity) ------------------------------------------------
 
     /** base64 -> Uint8Array (browser atob, Node Buffer). */
@@ -192,66 +224,11 @@
         var s = _str(value).trim();
         if (!s) return '';
         if (s.length <= 10) return s;
-        return s.slice(0, 7) + '…' + s.slice(-4);
+        return s.slice(0, 7) + '\u2026' + s.slice(-4);
     }
 
     function isValidPkHash(value) {
         return /^pk-[A-Za-z0-9_-]{12}$/.test(_str(value).trim());
-    }
-
-    /**
-     * The object written to the PRIVATE sink. This is the ONLY place a raw
-     * pix_key is carried -- it must never be passed to Edgar.
-     *
-     * Minimal by design: the planter's public key (pk_hash) + PIX key + program.
-     * Name / email / account-holder / relationship / no-key-channel are NOT
-     * collected any more.
-     */
-    function buildPayoutRegistrationEventText(fields) {
-        fields = fields || {};
-        var key = _str(fields.pixKey).trim();
-        var t = fields.pixKeyType || detectPixKeyType(key);
-        return [
-            '[PAYOUT REGISTRATION]',
-            '- Planting identity (pk_hash): ' + _str(fields.pkHash).trim(),
-            '- Program: ' + _str(fields.programSlug).trim(),
-            '- PIX key type: ' + (t || ''),
-            '- PIX key: ' + key,
-            '- Submission Source: ' + _str(fields.submissionSource).trim(),
-            '--------'
-        ].join('\n');
-    }
-
-    function buildPayoutRegistrationPayload(fields) {
-        fields = fields || {};
-        var key = _str(fields.pixKey).trim();
-        return {
-            pk_hash: _str(fields.pkHash).trim(),
-            program_slug: _str(fields.programSlug).trim(),
-            pix_key_type: fields.pixKeyType || detectPixKeyType(key),
-            pix_key: key,
-            has_key: Boolean(key),
-            submission_source: _str(fields.submissionSource).trim()
-        };
-    }
-
-    /**
-     * A public-safe, redacted summary. Deliberately carries NO raw key, so it
-     * is safe to display, forward to a governor, or (if ever) attach to any
-     * public-facing record.
-     */
-    function buildRedactedSummary(fields) {
-        fields = fields || {};
-        var t = fields.pixKeyType || detectPixKeyType(fields.pixKey);
-        var key = _str(fields.pixKey).trim();
-        return [
-            '[PAYOUT REGISTRATION]',
-            '- Planting identity (pk_hash): ' + (maskPkHash(fields.pkHash) || '(none)'),
-            '- Program: ' + _str(fields.programSlug).trim(),
-            '- PIX key type: ' + (t || '(none)'),
-            '- PIX key: ' + (key ? maskPixKey(key, t) : '(not provided)'),
-            '--------'
-        ].join('\n');
     }
 
     var utils = {
@@ -271,7 +248,6 @@
         maskPkHash: maskPkHash,
         isValidPkHash: isValidPkHash,
         buildPayoutRegistrationPayload: buildPayoutRegistrationPayload,
-        buildPayoutRegistrationEventText: buildPayoutRegistrationEventText,
         buildRedactedSummary: buildRedactedSummary
     };
 

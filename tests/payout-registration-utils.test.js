@@ -5,19 +5,15 @@
  * The privacy-critical assertions are:
  *   - a raw PIX key NEVER appears in buildRedactedSummary() output
  *   - maskPixKey() never leaks more than the trailing 1-4 chars
- *
- * The identity-contract assertions are:
- *   - pkHashFromSha256() matches the DAO's 'pk-' + base64url(sha256)[:12] shape
- *     (checked against Node's independent base64url oracle -- no key fixture)
- *   - the payload is minimal (pk_hash + pix_key + program only)
  */
 const assert = require('assert');
-const crypto = require('crypto');
 const u = require('../payout-registration-utils.js');
 
 let passed = 0, failed = 0;
-const queue = [];
-function test(name, fn) { queue.push([name, fn]); }
+function test(name, fn) {
+    try { fn(); passed++; console.log('  ok  ' + name); }
+    catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + e.message); }
+}
 
 // --- CPF -------------------------------------------------------------------
 test('isValidCpf accepts a valid CPF (dotted)', () => {
@@ -94,107 +90,44 @@ test('maskPixKey phone leaks only last 4', () => {
     assert.strictEqual(u.maskPixKey('+5511999998888'), '****8888');
 });
 
-// --- pk_hash (identity) ----------------------------------------------------
-test('pkHashFromSha256 formats as pk-<12> base64url (matches DAO convention)', () => {
-    // Hardcoded digest double -- no keypair needed. Node's base64url is the
-    // independent oracle for the alphabet/truncation rule.
-    const bytes = new Uint8Array(32);
-    for (let i = 0; i < 32; i++) bytes[i] = i * 7 % 256;
-    const h = u.pkHashFromSha256(bytes);
-    const ref = Buffer.from(bytes).toString('base64url').slice(0, 12);
-    assert.strictEqual(h, 'pk-' + ref);
-    assert.strictEqual(h.length, 15);
-    assert.strictEqual(u.isValidPkHash(h), true);
-});
-test('derivePkHash sha256s the decoded SPKI bytes (async)', async () => {
-    // Any bytes work -- derivePkHash hashes what it is given without validating
-    // it is a real key, so a tiny deterministic double suffices here.
-    const der = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
-    const b64 = Buffer.from(der).toString('base64');
-    const h = await u.derivePkHash(b64);
-    const ref = 'pk-' + crypto.createHash('sha256').update(Buffer.from(der)).digest('base64url').slice(0, 12);
-    assert.strictEqual(h, ref);
-});
-test('derivePkHash returns empty for no key', async () => {
-    assert.strictEqual(await u.derivePkHash(''), '');
-});
-test('maskPkHash keeps head + tail only', () => {
-    assert.strictEqual(u.maskPkHash('pk-abcdef123456'), 'pk-abcd… 3456'.replace(' ', ''));
-    assert.strictEqual(u.maskPkHash(''), '');
-});
-
 // --- payload split (the core contract) -------------------------------------
-test('buildPayoutRegistrationPayload is minimal: pk_hash + pix_key + program', () => {
+test('buildPayoutRegistrationPayload carries the RAW key (private sink only)', () => {
     const p = u.buildPayoutRegistrationPayload({
-        pkHash: 'pk-abcdef123456', programSlug: 'crf-anapu', pixKey: '111.444.777-35',
+        studentName: 'Maria', studentEmail: 'M@X.com', pkHash: 'abc',
+        programSlug: 'crf-anapu', pixKey: '111.444.777-35',
         submissionSource: 'https://cfr.truesight.me/payout_registration.html'
     });
     assert.strictEqual(p.pix_key, '111.444.777-35');
     assert.strictEqual(p.pix_key_type, 'CPF');
-    assert.strictEqual(p.pk_hash, 'pk-abcdef123456');
-    assert.strictEqual(p.program_slug, 'crf-anapu');
+    assert.strictEqual(p.student_email, 'm@x.com');  // lower-cased
     assert.strictEqual(p.has_key, true);
-    // The redundant identity fields are gone from the payload entirely:
-    assert.ok(!('student_name' in p));
-    assert.ok(!('student_email' in p));
-    assert.ok(!('account_holder' in p));
-    assert.ok(!('relationship' in p));
-    assert.ok(!('no_key_channel' in p));
+    assert.strictEqual(p.relationship, 'self');      // default
 });
 
-test('buildPayoutRegistrationPayload marks has_key=false for a blank key', () => {
-    const p = u.buildPayoutRegistrationPayload({ pkHash: 'pk-abcdef123456', pixKey: '' });
+test('buildPayoutRegistrationPayload honours a no-key student', () => {
+    const p = u.buildPayoutRegistrationPayload({
+        studentName: 'Joao', pixKey: '', noKeyChannel: 'guardian bank transfer'
+    });
     assert.strictEqual(p.has_key, false);
+    assert.strictEqual(p.no_key_channel, 'guardian bank transfer');
 });
 
 test('PRIVACY: redacted summary NEVER contains the raw key', () => {
     const raw = '111.444.777-35';
     const s = u.buildRedactedSummary({
-        pkHash: 'pk-abcdef123456', programSlug: 'crf-anapu', pixKey: raw
+        studentName: 'Maria', programSlug: 'crf-anapu', pixKey: raw
     });
     assert.ok(!s.includes(raw), 'raw CPF leaked into summary!');
     assert.ok(!s.includes('444'), 'middle digits leaked!');
     assert.ok(s.includes('***.***.***-35'));
     assert.ok(s.includes('[PAYOUT REGISTRATION]'));
-    assert.ok(s.includes('pk-abcd'), 'identity should be shown (masked)');
 });
 
 test('PRIVACY: redacted summary of an email key never leaks the local part', () => {
-    const s = u.buildRedactedSummary({ pkHash: 'pk-abcdef123456', pixKey: 'maria@example.com' });
+    const s = u.buildRedactedSummary({ studentName: 'A', pixKey: 'maria@example.com' });
     assert.ok(!s.includes('maria'));
     assert.ok(s.includes('m***@example.com'));
 });
 
-// --- Edgar event text (the section-11.6 transport) --------------------------
-test('buildPayoutRegistrationEventText carries the RAW key + sink-parseable shape', () => {
-    const raw = '111.444.777-35';
-    const t = u.buildPayoutRegistrationEventText({
-        pkHash: 'pk-abcdefghijkl', programSlug: 'crf-anapu', pixKey: raw,
-        submissionSource: 'https://cfr.truesight.me/payout_registration.html'
-    });
-    assert.ok(t.startsWith('[PAYOUT REGISTRATION]'), 'tag must be first line');
-    assert.ok(t.includes('- PIX key: ' + raw), 'raw key must be present in event text');
-    assert.ok(t.includes('- Planting identity (pk_hash): pk-abcdefghijkl'));
-    assert.ok(t.includes('- Program: crf-anapu'));
-    assert.ok(t.includes('- PIX key type: CPF'));
-    assert.ok(t.trimEnd().endsWith('--------'), 'must terminate with the field separator');
-});
-
-test('PROVENANCE-LAST: submission_source is the last field before --------', () => {
-    const t = u.buildPayoutRegistrationEventText({
-        pkHash: 'pk-abcdefghijkl', programSlug: 'crf-anapu', pixKey: '111.444.777-35',
-        submissionSource: 'https://cfr.truesight.me/payout_registration.html'
-    });
-    const lines = t.split('\n');
-    const sep = lines.indexOf('--------');
-    assert.ok(/^\- Submission Source: /.test(lines[sep - 1]), 'last field must be Submission Source, got: ' + lines[sep - 1]);
-});
-
-(async function run() {
-    for (const [name, fn] of queue) {
-        try { await fn(); passed++; console.log('  ok  ' + name); }
-        catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + e.message); }
-    }
-    console.log('\n' + passed + ' passed, ' + failed + ' failed');
-    process.exit(failed ? 1 : 0);
-})();
+console.log('\n' + passed + ' passed, ' + failed + ' failed');
+process.exit(failed ? 1 : 0);

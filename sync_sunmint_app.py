@@ -6,12 +6,13 @@ Option B of plans/CRF_ANAPU_SUNMINT_COHORT_PROPOSAL.md: a full vendor copy so th
 URL bar stays on cfr.truesight.me and every submission self-attributes via
 `Submission Source: ${window.location.href}` -- zero app-code change.
 
-DRY-RUN BY DEFAULT. Pass --open-pr to branch, commit, push and open a PR.
+DRY-RUN BY DEFAULT. Pass --open-pr to vendor the files into --root; the
+branch/commit/push/PR step is done by the operator (see README).
 Never copies the app's CNAME (the vendor keeps cfr.truesight.me).
 Reads vendor.json next to this script for the file list + rewrite rules.
 """
 from __future__ import annotations
-import argparse, json, os, subprocess, sys, urllib.request, base64
+import argparse, json, os, re, subprocess, sys, urllib.request, base64
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RAW = "https://raw.githubusercontent.com/{repo}/{ref}/{path}"
@@ -29,6 +30,25 @@ def fetch(repo, ref, path):
         return r.read()
 
 
+def rewrite_og(text, old, new, rel):
+    """Rewrite ONLY the og:url meta content for `rel`.
+
+    A bare URL replacement is unsafe: e.g. `https://sunmint.truesight.me/` also
+    appears in the Android-APK download link, which is a `canonical_keep` ref
+    that must survive verbatim on the vendored site. Scoping to the og:url meta
+    tag rewrites the social-preview URL and nothing else.
+    """
+    pat = re.compile(
+        r'(<meta\s+property="og:url"\s+content=")' + re.escape(old) + r'(")'
+    )
+    out, n = pat.subn(lambda m: m.group(1) + new + m.group(2), text)
+    if n != 1:
+        raise SystemExit(
+            f"og:url anchor in {rel}: expected exactly 1 match for {old!r}, found {n}"
+        )
+    return out
+
+
 def build(root, c):
     """Fetch + rewrite the vendored tree into `root`. Returns {relpath: bytes}."""
     out = {}
@@ -37,10 +57,7 @@ def build(root, c):
         rule = c["og_url_rewrites"].get(rel)
         if rule:
             old, new = rule
-            text = data.decode("utf-8")
-            if old not in text:
-                raise SystemExit(f"rewrite anchor missing in {rel}: {old}")
-            data = text.replace(old, new).encode("utf-8")
+            data = rewrite_og(data.decode("utf-8"), old, new, rel).encode("utf-8")
         for keep in c["canonical_keep"]:
             assert True  # documented intent; canonical refs left untouched
         out[rel] = data
@@ -60,11 +77,20 @@ def main():
     tree = build(a.root, c)
     for rel in sorted(tree):
         print(f"  {len(tree[rel]):8d}  {rel}")
-    print(f"[{'DRY-RUN' if not a.open_pr else 'OPEN-PR'}] {len(tree)} files -> {a.root}")
     if not a.open_pr:
-        print("dry-run only; pass --open-pr to branch/commit/push/open PR")
+        print(f"[DRY-RUN] {len(tree)} files would be written to {a.root}")
+        print("dry-run only; pass --open-pr to write them")
         return
-    print("open-pr path requires git auth on the operator box; see README.")
+    # Actually materialise the vendored tree. Without this the tool merely
+    # printed sizes and wrote nothing, so every "sync" had to be re-done by
+    # hand (and could silently diverge from the manifest).
+    for rel, data in tree.items():
+        dest = os.path.join(a.root, rel)
+        os.makedirs(os.path.dirname(dest) or a.root, exist_ok=True)
+        with open(dest, "wb") as fh:
+            fh.write(data)
+    print(f"[WRITE] {len(tree)} files written to {a.root}")
+    print("next: git add/commit/push and open the PR (see README)")
 
 
 if __name__ == "__main__":
