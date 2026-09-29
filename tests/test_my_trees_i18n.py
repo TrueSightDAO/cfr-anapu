@@ -132,5 +132,39 @@ class TestMyTreesI18n(unittest.TestCase):
         )
 
 
+    def test_txid_is_copyable_and_deep_linkable(self):
+        # Gary (2026-09-29): the transaction request id must itself be linkable --
+        # copyable, and openable via ?tx=<id> so a payee can paste it and the tree
+        # scrolls into view. Guard the whole chain.
+        for key in ("copyTxid", "copyLink", "copied", "copyUnavailable",
+                    "txidDeepLinkNote", "txidMultiNote", "deepLinkNoMatch"):
+            self.assertGreaterEqual(
+                self.html.count(key + ":"), 2, f"{key} must exist in both pt and en"
+            )
+        self.assertIn('data-txid="', self.html)
+        self.assertIn("searchParams.set('tx'", self.html)
+        self.assertIn("MyTreesUtils.featuresMatchingTxid(", self.html)
+        self.assertRegex(self.html, r"function copyTxid\s*\(txid, el\)")
+        self.assertRegex(self.html, r"function copyTxidLink\s*\(txid, el\)")
+        self.assertRegex(self.html, r"function focusTreeFromUrlResult\s*\(")
+        self.assertIn("focusTreeFromUrlResult(ok,", self.html)
+        # a shared txid expands EVERY match, never silently one
+        self.assertRegex(self.html, r"function selectTreeMulti\s*\(")
+
+
+    def test_deep_link_works_for_keyless_visitor(self):
+        # Gary (2026-09-29): the ?tx= / ?tree= deep link must resolve for a
+        # visitor with NO identity -- a read-only public view of the linked
+        # tree(s) from the public feed, never the whole feed.
+        for key in ("publicView", "introPublic"):
+            self.assertGreaterEqual(
+                self.html.count(key + ":"), 2, f"{key} must exist in both pt and en"
+            )
+        # the keyless branch fetches the feed and renders ONLY the matches
+        self.assertIn("MyTreesUtils.featuresMatchingTreeId(", self.html)
+        self.assertRegex(self.html, r"if \(!linkTx && !linkTree\)")
+        self.assertIn("applyStatus('publicView'", self.html)
+
+
 if __name__ == "__main__":
     unittest.main()
